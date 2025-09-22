@@ -1,41 +1,46 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scrollable iFrames</title>
     <style>
-        /* 기본 스타일 초기화 */
-        body, html {
+        /* Basic CSS reset to remove default browser margins and padding */
+        html, body {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden; /* 중요: 브라우저 기본 스크롤바를 숨깁니다 */
+            /* IMPORTANT: Prevents the default browser scrollbar */
+            overflow: hidden;
             font-family: sans-serif;
+            background-color: #000; /* Added a background color */
         }
 
-        /* 아이프레임을 감싸는 컨테이너 */
+        /* The main container that holds all iframe sections.
+           The transition property creates the smooth scrolling animation. */
         #iframe-container {
             width: 100%;
             height: 100%;
-            /* 스크롤 애니메이션을 부드럽게 만듭니다 */
             transition: transform 0.7s cubic-bezier(0.86, 0, 0.07, 1);
         }
 
-        /* 개별 아이프레임 섹션 */
+        /* Each section is a full-screen container for one iframe.
+           '100vh' means 100% of the viewport height. */
         .iframe-section {
-            width: 100vw; /* 뷰포트 너비의 100% */
-            height: 100vh; /* 뷰포트 높이의 100% */
+            width: 100vw; /* 100% of the viewport width */
+            height: 100vh; /* 100% of the viewport height */
             display: flex;
             justify-content: center;
             align-items: center;
             flex-shrink: 0;
         }
 
+        /* The iframe element itself.
+           It will fill its parent container (.iframe-section). */
         .playableGames {
             width: 100%;
-            height: 100%; /* 부모 요소(section)의 100%를 차지 */
+            height: 100%;
             border: none;
         }
     </style>
@@ -60,45 +65,29 @@
         </section>
     </div>
 
-    <div id="iframe-container">
-        <section class="iframe-section">
-            <iframe class="playableGames" src="https://funhtml5games.com?embed=doodlejump"></iframe>
-        </section>
-        <section class="iframe-section">
-            <iframe class="playableGames" src="https://funhtml5games.com?embed=cuttherope"></iframe>
-        </section>
-        <section class="iframe-section">
-            <iframe class="playableGames" src="https://funhtml5games.com?embed=pacman"></iframe>
-        </section>
-        <section class="iframe-section">
-            <iframe class="playableGames" src="https://funhtml5games.com?embed=tetris"></iframe>
-        </section>
-        <section class="iframe-section">
-            <iframe class="playableGames" src="https://funhtml5games.com?embed=flappybird"></iframe>
-        </section>
-    </div>
-
     <script>
         const container = document.getElementById('iframe-container');
         const sections = document.querySelectorAll('.iframe-section');
         const totalSections = sections.length;
+        
         let currentSectionIndex = 0;
-        let isScrolling = false; // 현재 애니메이션 중인지 확인하는 변수
+        // A flag to prevent scrolling again while an animation is already in progress.
+        let isScrolling = false; 
 
-        // 마우스 휠 이벤트 리스너 추가
+        // Add an event listener for the 'wheel' event (mouse scroll).
         window.addEventListener('wheel', (event) => {
-            if (isScrolling) return; // 애니메이션 중이면 아무것도 하지 않음
+            // If an animation is playing, ignore this scroll event.
+            if (isScrolling) return;
 
-            // event.deltaY 값으로 스크롤 방향을 확인
-            // 양수(+)는 아래로 스크롤, 음수(-)는 위로 스크롤
+            // 'event.deltaY' is positive for scrolling down, negative for scrolling up.
             if (event.deltaY > 0) {
-                // 아래로 스크롤하고, 마지막 섹션이 아닐 때
+                // If scrolling down and not on the last section...
                 if (currentSectionIndex < totalSections - 1) {
                     currentSectionIndex++;
                     scrollToCurrentSection();
                 }
             } else {
-                // 위로 스크롤하고, 첫 번째 섹션이 아닐 때
+                // If scrolling up and not on the first section...
                 if (currentSectionIndex > 0) {
                     currentSectionIndex--;
                     scrollToCurrentSection();
@@ -107,14 +96,18 @@
         });
 
         function scrollToCurrentSection() {
+            // Set the flag to true to block other scroll events.
             isScrolling = true;
-            // Y축으로 (현재 섹션 인덱스 * 100vh) 만큼 컨테이너를 이동시킴
+            
+            // Move the container up or down using CSS Transform.
+            // The position is calculated by the current index * 100vh.
             container.style.transform = `translateY(-${currentSectionIndex * 100}vh)`;
 
-            // 애니메이션이 끝나는 시간(700ms) 후에 isScrolling을 false로 변경
+            // After the animation duration (700ms), reset the flag to false
+            // to allow the next scroll event.
             setTimeout(() => {
                 isScrolling = false;
-            }, 700);
+            }, 700); // This time should match the CSS transition duration.
         }
     </script>
 
