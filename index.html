@@ -3,113 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scrollable iFrames</title>
-    <style>
-        /* Basic CSS reset to remove default browser margins and padding */
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            /* IMPORTANT: Prevents the default browser scrollbar */
-            overflow: hidden;
-            font-family: sans-serif;
-            background-color: #000; /* Added a background color */
-        }
-
-        /* The main container that holds all iframe sections.
-           The transition property creates the smooth scrolling animation. */
-        #iframe-container {
-            width: 100%;
-            height: 100%;
-            transition: transform 0.6s cubic-bezier(0.86, 0, 0.07, 1);
-        }
-
-        /* Each section is a full-screen container for one iframe.
-           '100vh' means 100% of the viewport height. */
-        .iframe-section {
-            width: 100vw; /* 100% of the viewport width */
-            height: 100vh; /* 100% of the viewport height */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        /* The iframe element itself.
-           It will fill its parent container (.iframe-section). */
-        .playableGames {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-    </style>
+    <title>Shorts And Sweet</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="container">
+        <div class="games_container" id="gamesContainer">
+            <!-- Games will be dynamically loaded here -->
+        </div>
 
-    <div id="iframe-container">
-        <section class="iframe-section">
-            <iframe class="playableGames" src="https://funhtml5games.com?embed=doodlejump"></iframe>
-        </section>
-        <section class="iframe-section">
-            <iframe class="playableGames" src="https://funhtml5games.com?embed=doodlejump"></iframe>
-        </section>
-        <section class="iframe-section">
-            <iframe class="playableGames" src="https://funhtml5games.com?embed=doodlejump"></iframe>
-        </section>
-        <section class="iframe-section">
-            <iframe class="playableGames" src="https://funhtml5games.com?embed=doodlejump"></iframe>
-        </section>
-        <section class="iframe-section">
-            <iframe class="playableGames" src="https://funhtml5games.com?embed=doodlejump"></iframe>
-        </section>
+        <div class="footer_container">
+            <div class="game_info">
+                <div class="game_title">example</div>
+                <div class="game_creator">jafar</div>
+            </div>
+            <div class="buttons_container">
+                <button class="buttons" id="likeButton">
+                    like
+                </button>
+                <button class="buttons" id="shareButton">
+                    share
+                </button>
+                <button class="buttons" id="followButton">
+                    follow
+                </button>
+                <button class="buttons" id="saveButton">
+                    save
+                </button>
+                <button class="buttons" id="settingsButton">
+                    settings
+                </button>
+            </div> 
+        </div>       
     </div>
-
-    <script>
-        const container = document.getElementById('iframe-container');
-        const sections = document.querySelectorAll('.iframe-section');
-        const totalSections = sections.length;
-        
-        let currentSectionIndex = 0;
-        // A flag to prevent scrolling again while an animation is already in progress.
-        let isScrolling = false; 
-
-        // Add an event listener for the 'wheel' event (mouse scroll).
-        window.addEventListener('wheel', (event) => {
-            // If an animation is playing, ignore this scroll event.
-            if (isScrolling) return;
-
-            // 'event.deltaY' is positive for scrolling down, negative for scrolling up.
-            if (event.deltaY > 0) {
-                // If scrolling down and not on the last section...
-                if (currentSectionIndex < totalSections - 1) {
-                    currentSectionIndex++;
-                    scrollToCurrentSection();
-                }
-            } else {
-                // If scrolling up and not on the first section...
-                if (currentSectionIndex > 0) {
-                    currentSectionIndex--;
-                    scrollToCurrentSection();
-                }
-            }
-        });
-
-        function scrollToCurrentSection() {
-            // Set the flag to true to block other scroll events.
-            isScrolling = true;
-            
-            // Move the container up or down using CSS Transform.
-            // The position is calculated by the current index * 100vh.
-            container.style.transform = `translateY(-${currentSectionIndex * 100}vh)`;
-
-            // After the animation duration (700ms), reset the flag to false
-            // to allow the next scroll event.
-            setTimeout(() => {
-                isScrolling = false;
-            }, 700); // This time should match the CSS transition duration.
-        }
-    </script>
-
+    <script src="script.js"></script>
 </body>
 </html>

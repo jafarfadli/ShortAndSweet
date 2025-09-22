@@ -1,0 +1,106 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: black;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: min(calc(100vh * 540/(960 * (100/85))), 100%);
+
+    align-self: center;
+}
+
+.games_container {
+    width: 100%;
+    aspect-ratio: 540 / 960;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    position: relative;
+}
+
+.game {
+    width: 100%;
+    aspect-ratio: 540 / 960;
+    scroll-snap-align: start;
+    position: relative;
+
+    align-items: center;
+    justify-content: center;
+    border-bottom: 2px solid black;
+}
+
+.playableGames {
+    width: 100%;
+    aspect-ratio: 540 / 960;
+    overflow-y: hidden;
+    background: green;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.footer_container {
+    width: 100%; 
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+}
+.game_info {
+    width: 100%; 
+    flex: 1;
+    background-color: lightgray;
+
+    display: flex;
+    flex-direction: row;
+}
+.game_title {
+    flex: 1;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 10px;
+}
+.game_creator {
+    flex: 1;
+    font-size: 18px;
+    padding: 10px;
+    font-weight: bold;
+    text-align: right;
+}
+.buttons_container {
+    width: 100%; 
+    flex: 1;
+
+    display: flex;
+    flex-direction: row;
+}
+
+.buttons {
+	border-style: inherit;
+
+    background-color: white;
+	color: black;
+
+	font-size: 16px;
+    text-align: center;
+	font-weight: bold;
+
+    flex: 1;
+    aspect-ratio: 1 / 1;
+    border: 1px solid black;
+
+    cursor: pointer;
+}
