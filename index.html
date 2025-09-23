@@ -8,34 +8,110 @@
 </head>
 <body>
     <div class="container">
+        <div class="header_container" id="headerContainer">
+            <input type="text" class="input_text" id="searchBar" placeholder="Search Games...">
+            <button class="profileButton" id="profileButton">JF</button>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <div class="dropdown-item" id="profileMenuItem">Profile</div>
+                <div class="dropdown-item" id="savedGamesMenuItem">Saved Games</div>
+                <div class="dropdown-item" id="homeMenuItem">Home</div>
+            </div>
+        </div>
+
+        <!-- Focus Mode Buttons -->
+        <button class="header_container exit-focus" id="exitFocusButton">Exit Focus</button>
+
         <div class="games_container" id="gamesContainer">
             <!-- Games will be dynamically loaded here -->
         </div>
 
-        <div class="footer_container">
-            <div class="game_info">
-                <div class="game_title">example</div>
-                <div class="game_creator">jafar</div>
+        <!-- Profile Page -->
+        <div class="page" id="profilePage">
+            <div class="page-header">
+                <button class="back-button" id="profileBackButton">←</button>
+                <div class="page-title">Profile</div>
             </div>
+            
+            <div class="profile-info">
+                <div class="profile-avatar">JF</div>
+                <div class="profile-details">
+                    <div class="profile-name">Jafar Fadli</div>
+                    <div class="profile-email">archaeopteryx1500@gmail.com</div>
+                    <div class="profile-stats">
+                        <div class="stat">
+                            <div class="stat-number" id="savedCount">0</div>
+                            <div class="stat-label">Saved Games</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">1.2K</div>
+                            <div class="stat-label">Followers</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">856</div>
+                            <div class="stat-label">Following</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">24</div>
+                            <div class="stat-label">Games Played</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-options">
+                <button class="menu-option">Settings</button>
+                <button class="menu-option">Share Profile</button>
+                <button class="menu-option">Help & Support</button>
+                <button class="menu-option" style="color: #ff4444;">Sign Out</button>
+            </div>
+        </div>
+
+        <!-- Saved Games Page -->
+        <div class="page" id="savedGamesPage">
+            <div class="page-header">
+                <button class="back-button" id="savedBackButton">←</button>
+                <div class="page-title">Saved Games</div>
+            </div>
+            
+            <div class="saved-games-container">
+                <div class="saved-search-container">
+                    <input type="text" class="saved-search-bar" id="savedSearchBar" placeholder="Search saved games...">
+                </div>
+                
+                <div class="saved-games-grid" id="savedGamesGrid">
+                    <!-- Saved games will be displayed here -->
+                </div>
+                
+                <div class="no-results" id="noSavedGames" style="display: none;">
+                    No saved games yet. Save some games to see them here!
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Results Overlay -->
+        <div class="search-results" id="searchResults">
+            <div class="search-header">
+                <button class="back-button" id="backButton">←</button>
+                <div class="search-title">Search Results</div>
+            </div>
+            <div class="search-grid" id="searchGrid">
+                <!-- Search results will be displayed here -->
+            </div>
+            <div class="no-results" id="noResults" style="display: none;">
+                No games found matching your search.
+            </div>
+        </div>
+
+        <div class="footer_container">
             <div class="buttons_container">
-                <button class="buttons" id="likeButton">
-                    like
-                </button>
-                <button class="buttons" id="shareButton">
-                    share
-                </button>
-                <button class="buttons" id="followButton">
-                    follow
-                </button>
-                <button class="buttons" id="saveButton">
-                    save
-                </button>
-                <button class="buttons" id="settingsButton">
-                    settings
-                </button>
+                <button class="buttons" id="likeButton">Like</button>
+                <button class="buttons" id="shareButton">Share</button>
+                <button class="buttons" id="followButton">Follow</button>
+                <button class="buttons" id="saveButton">Save</button>
             </div> 
         </div>       
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
