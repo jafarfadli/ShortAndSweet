@@ -3,20 +3,681 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Courgette&family=Lobster&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>Animal Habitat Match - Educational Mini-Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: black;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #game-container {
+            width: 500px;
+            height: 800px;
+            background-color: black;
+            border: 2px solid white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        #start-screen {
+            background-color: #264653;
+            color: white;
+        }
+        
+        #game-screen {
+            background-color: #264653;
+            display: none;
+            justify-content: flex-start;
+            padding-top: 20px;
+        }
+        
+        #end-screen {
+            background-color: #264653;
+            display: none;
+            color: white;
+        }
+        
+        h1 {
+            color: #2a9d8f;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #e9c46a;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        
+        p {
+            font-size: 20px;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        button {
+            background-color: #2a9d8f;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-family: inherit;
+        }
+        
+        button:hover {
+            background-color: #21867a;
+        }
+        
+        #score-container {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        #level-container {
+            color: #e9c46a;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        #timer {
+            width: 100%;
+            height: 8px;
+            background-color: #1a535c;
+            margin: 10px 0;
+        }
+        
+        #timer-progress {
+            height: 100%;
+            background-color: #e76f51;
+            width: 100%;
+        }
+        
+        #question-container {
+            color: white;
+            font-size: 24px;
+            margin: 15px 0;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #habitats-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            width: 100%;
+        }
+        
+        .habitat {
+            width: 220px;
+            height: 120px;
+            background-color: #1a535c;
+            border: 3px solid #2a9d8f;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .habitat:hover {
+            transform: scale(1.05);
+            border-color: #e9c46a;
+        }
+        
+        .habitat.correct {
+            border-color: #2a9d8f;
+            background-color: #1d7870;
+        }
+        
+        .habitat.incorrect {
+            border-color: #e76f51;
+            background-color: #b3543d;
+        }
+        
+        .habitat-icon {
+            font-size: 40px;
+            margin-bottom: 5px;
+        }
+        
+        .habitat-name {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        #animal-display {
+            font-size: 80px;
+            margin: 20px 0;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #feedback {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+            min-height: 30px;
+        }
+        
+        .correct {
+            color: #2a9d8f;
+        }
+        
+        .incorrect {
+            color: #e76f51;
+        }
+        
+        #progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: #1a535c;
+            margin: 10px 0;
+            position: relative;
+        }
+        
+        #progress-bar {
+            height: 100%;
+            background-color: #e9c46a;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        #progress-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 14px;
+            line-height: 20px;
+        }
+        
+        #hint-button {
+            background-color: #e9c46a;
+            color: #264653;
+            padding: 8px 16px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .habitat.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+    </style>
 </head>
 <body>
-    <div class="judul">
-        <span>G</span>
-        <span>A</span>
-        <span>M</span>
-        <span>E</span>
-        <span>7</span>
-    </div><br>
+    <div id="game-container">
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen">
+            <h1>Animal Habitat Match</h1>
+            <p>Match each animal to its correct habitat!</p>
+            <p>Learn about where different animals live in nature.</p>
+            <button id="start-button">Start Game</button>
+        </div>
+        
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div id="score-container">Score: <span id="score">0</span></div>
+            <div id="level-container">Level: <span id="level">1</span> | Animals: <span id="animals-matched">0</span>/<span id="total-animals">0</span></div>
+            <div id="timer">
+                <div id="timer-progress"></div>
+            </div>
+            <div id="question-container">Where does this animal live?</div>
+            <div id="animal-display">🐘</div>
+            <div id="habitats-container"></div>
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+                <div id="progress-text">Progress: 0%</div>
+            </div>
+            <div id="feedback"></div>
+            <button id="hint-button">Need a Hint?</button>
+        </div>
+        
+        <!-- End Screen -->
+        <div id="end-screen" class="screen">
+            <h1>Game Over!</h1>
+            <h2>Your Score: <span id="final-score">0</span></h2>
+            <p>Level Reached: <span id="final-level">1</span></p>
+            <p>Animals Matched: <span id="final-animals">0</span></p>
+            <p id="performance-message"></p>
+            <button id="restart-button">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            score: 0,
+            level: 1,
+            animalsMatched: 0,
+            totalAnimals: 0,
+            timeLeft: 75,
+            timerInterval: null,
+            gameActive: false,
+            currentAnimal: null,
+            habitats: [],
+            hintsUsed: 0
+        };
+        
+        // Animals and their habitats
+        const animalHabitats = [
+            {
+                animal: "🐘",
+                name: "Elephant",
+                correctHabitat: "savanna",
+                habitats: [
+                    { name: "Savanna", icon: "🌾", id: "savanna" },
+                    { name: "Ocean", icon: "🌊", id: "ocean" },
+                    { name: "Arctic", icon: "❄️", id: "arctic" },
+                    { name: "Jungle", icon: "🌴", id: "jungle" }
+                ],
+                hint: "Elephants live in grasslands with scattered trees"
+            },
+            {
+                animal: "🐧",
+                name: "Penguin",
+                correctHabitat: "arctic",
+                habitats: [
+                    { name: "Savanna", icon: "🌾", id: "savanna" },
+                    { name: "Ocean", icon: "🌊", id: "ocean" },
+                    { name: "Arctic", icon: "❄️", id: "arctic" },
+                    { name: "Desert", icon: "🏜️", id: "desert" }
+                ],
+                hint: "Penguins live in cold, icy environments"
+            },
+            {
+                animal: "🐠",
+                name: "Tropical Fish",
+                correctHabitat: "ocean",
+                habitats: [
+                    { name: "Ocean", icon: "🌊", id: "ocean" },
+                    { name: "Forest", icon: "🌲", id: "forest" },
+                    { name: "Desert", icon: "🏜️", id: "desert" },
+                    { name: "Farm", icon: "🚜", id: "farm" }
+                ],
+                hint: "Tropical fish live in warm ocean waters"
+            },
+            {
+                animal: "🐪",
+                name: "Camel",
+                correctHabitat: "desert",
+                habitats: [
+                    { name: "Desert", icon: "🏜️", id: "desert" },
+                    { name: "Forest", icon: "🌲", id: "forest" },
+                    { name: "Arctic", icon: "❄️", id: "arctic" },
+                    { name: "Jungle", icon: "🌴", id: "jungle" }
+                ],
+                hint: "Camels are adapted to live in dry, sandy places"
+            },
+            {
+                animal: "🐒",
+                name: "Monkey",
+                correctHabitat: "jungle",
+                habitats: [
+                    { name: "Jungle", icon: "🌴", id: "jungle" },
+                    { name: "Ocean", icon: "🌊", id: "ocean" },
+                    { name: "Arctic", icon: "❄️", id: "arctic" },
+                    { name: "Farm", icon: "🚜", id: "farm" }
+                ],
+                hint: "Monkeys live in tropical forests with lots of trees"
+            },
+            {
+                animal: "🐻",
+                name: "Bear",
+                correctHabitat: "forest",
+                habitats: [
+                    { name: "Forest", icon: "🌲", id: "forest" },
+                    { name: "Desert", icon: "🏜️", id: "desert" },
+                    { name: "Ocean", icon: "🌊", id: "ocean" },
+                    { name: "Savanna", icon: "🌾", id: "savanna" }
+                ],
+                hint: "Bears live in wooded areas with trees and rivers"
+            },
+            {
+                animal: "🦒",
+                name: "Giraffe",
+                correctHabitat: "savanna",
+                habitats: [
+                    { name: "Savanna", icon: "🌾", id: "savanna" },
+                    { name: "Arctic", icon: "❄️", id: "arctic" },
+                    { name: "Ocean", icon: "🌊", id: "ocean" },
+                    { name: "Mountain", icon: "⛰️", id: "mountain" }
+                ],
+                hint: "Giraffes live in African grasslands with acacia trees"
+            },
+            {
+                animal: "🦀",
+                name: "Crab",
+                correctHabitat: "beach",
+                habitats: [
+                    { name: "Beach", icon: "🏖️", id: "beach" },
+                    { name: "Forest", icon: "🌲", id: "forest" },
+                    { name: "Farm", icon: "🚜", id: "farm" },
+                    { name: "City", icon: "🏙️", id: "city" }
+                ],
+                hint: "Crabs live along shorelines where land meets sea"
+            },
+            {
+                animal: "🦉",
+                name: "Owl",
+                correctHabitat: "forest",
+                habitats: [
+                    { name: "Forest", icon: "🌲", id: "forest" },
+                    { name: "Desert", icon: "🏜️", id: "desert" },
+                    { name: "Ocean", icon: "🌊", id: "ocean" },
+                    { name: "City", icon: "🏙️", id: "city" }
+                ],
+                hint: "Owls live in wooded areas where they can nest in trees"
+            },
+            {
+                animal: "🐄",
+                name: "Cow",
+                correctHabitat: "farm",
+                habitats: [
+                    { name: "Farm", icon: "🚜", id: "farm" },
+                    { name: "Jungle", icon: "🌴", id: "jungle" },
+                    { name: "Arctic", icon: "❄️", id: "arctic" },
+                    { name: "Ocean", icon: "🌊", id: "ocean" }
+                ],
+                hint: "Cows are domestic animals that live on farms"
+            }
+        ];
+        
+        // DOM elements
+        const elements = {
+            startScreen: document.getElementById('start-screen'),
+            gameScreen: document.getElementById('game-screen'),
+            endScreen: document.getElementById('end-screen'),
+            startButton: document.getElementById('start-button'),
+            restartButton: document.getElementById('restart-button'),
+            hintButton: document.getElementById('hint-button'),
+            habitatsContainer: document.getElementById('habitats-container'),
+            questionContainer: document.getElementById('question-container'),
+            animalDisplay: document.getElementById('animal-display'),
+            scoreDisplay: document.getElementById('score'),
+            levelDisplay: document.getElementById('level'),
+            animalsMatchedDisplay: document.getElementById('animals-matched'),
+            totalAnimalsDisplay: document.getElementById('total-animals'),
+            finalScoreDisplay: document.getElementById('final-score'),
+            finalLevelDisplay: document.getElementById('final-level'),
+            finalAnimalsDisplay: document.getElementById('final-animals'),
+            timerProgress: document.getElementById('timer-progress'),
+            feedback: document.getElementById('feedback'),
+            progressBar: document.getElementById('progress-bar'),
+            progressText: document.getElementById('progress-text'),
+            performanceMessage: document.getElementById('performance-message')
+        };
+        
+        // Event listeners
+        elements.startButton.addEventListener('click', startGame);
+        elements.restartButton.addEventListener('click', startGame);
+        elements.hintButton.addEventListener('click', showHint);
+        
+        function startGame() {
+            // Reset game state
+            gameState.score = 0;
+            gameState.level = 1;
+            gameState.animalsMatched = 0;
+            gameState.timeLeft = 75;
+            gameState.gameActive = true;
+            gameState.hintsUsed = 0;
+            
+            elements.scoreDisplay.textContent = gameState.score;
+            elements.levelDisplay.textContent = gameState.level;
+            elements.timerProgress.style.width = '100%';
+            elements.feedback.textContent = '';
+            elements.progressBar.style.width = '0%';
+            elements.progressText.textContent = 'Progress: 0%';
+            
+            // Show game screen
+            elements.startScreen.style.display = 'none';
+            elements.endScreen.style.display = 'none';
+            elements.gameScreen.style.display = 'flex';
+            
+            // Start timer
+            clearInterval(gameState.timerInterval);
+            gameState.timerInterval = setInterval(updateTimer, 100);
+            
+            // Start first level
+            startLevel();
+        }
+        
+        function updateTimer() {
+            if (!gameState.gameActive) return;
+            
+            gameState.timeLeft -= 0.1;
+            elements.timerProgress.style.width = `${(gameState.timeLeft / 75) * 100}%`;
+            
+            if (gameState.timeLeft <= 0) {
+                endGame();
+            }
+        }
+        
+        function startLevel() {
+            // Determine number of animals based on level
+            const animalsPerLevel = Math.min(3 + gameState.level, 8);
+            gameState.totalAnimals = animalsPerLevel;
+            gameState.animalsMatched = 0;
+            
+            elements.animalsMatchedDisplay.textContent = gameState.animalsMatched;
+            elements.totalAnimalsDisplay.textContent = gameState.totalAnimals;
+            
+            // Select random animals for this level
+            const shuffledAnimals = shuffleArray([...animalHabitats]);
+            gameState.levelAnimals = shuffledAnimals.slice(0, gameState.totalAnimals);
+            gameState.currentAnimalIndex = 0;
+            
+            // Show first animal
+            showNextAnimal();
+            
+            // Update progress
+            updateProgress();
+        }
+        
+        function showNextAnimal() {
+            if (gameState.currentAnimalIndex >= gameState.levelAnimals.length) {
+                completeLevel();
+                return;
+            }
+            
+            gameState.currentAnimal = gameState.levelAnimals[gameState.currentAnimalIndex];
+            
+            // Update display
+            elements.animalDisplay.textContent = gameState.currentAnimal.animal;
+            elements.questionContainer.textContent = `Where does the ${gameState.currentAnimal.name} live?`;
+            elements.feedback.textContent = '';
+            elements.hintButton.disabled = false;
+            
+            // Create habitat options
+            createHabitats();
+        }
+        
+        function createHabitats() {
+            // Clear previous habitats
+            elements.habitatsContainer.innerHTML = '';
+            gameState.habitats = [];
+            
+            // Create habitat elements
+            gameState.currentAnimal.habitats.forEach(habitat => {
+                const habitatElement = document.createElement('div');
+                habitatElement.className = 'habitat';
+                habitatElement.dataset.habitatId = habitat.id;
+                
+                const iconElement = document.createElement('div');
+                iconElement.className = 'habitat-icon';
+                iconElement.textContent = habitat.icon;
+                
+                const nameElement = document.createElement('div');
+                nameElement.className = 'habitat-name';
+                nameElement.textContent = habitat.name;
+                
+                habitatElement.appendChild(iconElement);
+                habitatElement.appendChild(nameElement);
+                
+                habitatElement.addEventListener('click', () => selectHabitat(habitat.id, habitatElement));
+                elements.habitatsContainer.appendChild(habitatElement);
+                gameState.habitats.push(habitatElement);
+            });
+        }
+        
+        function selectHabitat(habitatId, habitatElement) {
+            if (!gameState.gameActive) return;
+            
+            // Disable all habitats
+            gameState.habitats.forEach(habitat => {
+                habitat.classList.add('disabled');
+            });
+            
+            // Check if correct
+            if (habitatId === gameState.currentAnimal.correctHabitat) {
+                // Correct habitat
+                gameState.score += 20 * gameState.level;
+                gameState.animalsMatched++;
+                
+                elements.scoreDisplay.textContent = gameState.score;
+                elements.animalsMatchedDisplay.textContent = gameState.animalsMatched;
+                elements.feedback.textContent = 'Correct! ' + gameState.currentAnimal.name + ' lives in the ' + 
+                    gameState.currentAnimal.habitats.find(h => h.id === habitatId).name;
+                elements.feedback.className = 'correct';
+                
+                habitatElement.classList.add('correct');
+                
+                // Move to next animal after delay
+                setTimeout(() => {
+                    gameState.currentAnimalIndex++;
+                    showNextAnimal();
+                }, 2000);
+            } else {
+                // Incorrect habitat
+                elements.feedback.textContent = 'Not quite! Try again.';
+                elements.feedback.className = 'incorrect';
+                
+                habitatElement.classList.add('incorrect');
+                
+                // Highlight correct habitat
+                const correctHabitat = gameState.habitats.find(h => 
+                    h.dataset.habitatId === gameState.currentAnimal.correctHabitat);
+                correctHabitat.classList.add('correct');
+                
+                // Move to next animal after delay
+                setTimeout(() => {
+                    gameState.currentAnimalIndex++;
+                    showNextAnimal();
+                }, 2000);
+            }
+            
+            // Update progress
+            updateProgress();
+        }
+        
+        function showHint() {
+            if (!gameState.gameActive || gameState.hintsUsed >= 2) return;
+            
+            gameState.hintsUsed++;
+            elements.feedback.textContent = "Hint: " + gameState.currentAnimal.hint;
+            elements.feedback.className = 'correct';
+            elements.hintButton.disabled = true;
+            
+            // Reduce points for using hint
+            gameState.score = Math.max(0, gameState.score - 15);
+            elements.scoreDisplay.textContent = gameState.score;
+        }
+        
+        function updateProgress() {
+            const progress = (gameState.animalsMatched / gameState.totalAnimals) * 100;
+            elements.progressBar.style.width = progress + '%';
+            elements.progressText.textContent = 'Progress: ' + Math.round(progress) + '%';
+        }
+        
+        function completeLevel() {
+            if (!gameState.gameActive) return;
+            
+            // Level completion bonus
+            gameState.score += Math.floor(gameState.timeLeft) * 3;
+            elements.scoreDisplay.textContent = gameState.score;
+            
+            // Increase level
+            gameState.level++;
+            elements.levelDisplay.textContent = gameState.level;
+            
+            // Reset timer for next level
+            gameState.timeLeft = 75;
+            elements.timerProgress.style.width = '100%';
+            gameState.hintsUsed = 0;
+            
+            // Start next level
+            setTimeout(startLevel, 1500);
+        }
+        
+        function endGame() {
+            gameState.gameActive = false;
+            clearInterval(gameState.timerInterval);
+            
+            // Update final score
+            elements.finalScoreDisplay.textContent = gameState.score;
+            elements.finalLevelDisplay.textContent = gameState.level - 1;
+            elements.finalAnimalsDisplay.textContent = gameState.animalsMatched;
+            
+            // Performance message
+            if (gameState.level > 5) {
+                elements.performanceMessage.textContent = 'Amazing! You\'re an animal habitat expert!';
+            } else if (gameState.level > 3) {
+                elements.performanceMessage.textContent = 'Great job! You know where animals live!';
+            } else if (gameState.level > 1) {
+                elements.performanceMessage.textContent = 'Good effort! Keep learning about animals!';
+            } else {
+                elements.performanceMessage.textContent = 'Nice try! You\'ll learn more with practice!';
+            }
+            
+            // Show end screen
+            elements.gameScreen.style.display = 'none';
+            elements.endScreen.style.display = 'flex';
+        }
+        
+        // Utility function to shuffle array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+    </script>
 </body>
 </html>

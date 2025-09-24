@@ -3,20 +3,673 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Courgette&family=Lobster&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>Word Builder - Educational Mini-Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: black;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #game-container {
+            width: 500px;
+            height: 800px;
+            background-color: black;
+            border: 2px solid white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        #start-screen {
+            background-color: #1a1a3a;
+            color: white;
+        }
+        
+        #game-screen {
+            background-color: #1a1a3a;
+            display: none;
+            justify-content: flex-start;
+            padding-top: 40px;
+        }
+        
+        #end-screen {
+            background-color: #1a1a3a;
+            display: none;
+            color: white;
+        }
+        
+        h1 {
+            color: #FF6B6B;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #4ECDC4;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        
+        p {
+            font-size: 20px;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        button {
+            background-color: #FF6B6B;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-family: inherit;
+        }
+        
+        button:hover {
+            background-color: #FF5252;
+        }
+        
+        #word-image {
+            width: 200px;
+            height: 150px;
+            background-color: #2a2a5a;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: white;
+        }
+        
+        #current-word {
+            font-size: 32px;
+            color: white;
+            margin: 20px 0;
+            min-height: 50px;
+            letter-spacing: 5px;
+        }
+        
+        #letters-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            max-width: 400px;
+        }
+        
+        .letter {
+            width: 50px;
+            height: 50px;
+            background-color: #4ECDC4;
+            color: white;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid #2a9d8f;
+            user-select: none;
+        }
+        
+        .letter:hover {
+            background-color: #45b5b0;
+        }
+        
+        .letter.used {
+            background-color: #555;
+            cursor: default;
+            opacity: 0.5;
+        }
+        
+        #score-container {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        #hint-container {
+            color: #FFD166;
+            font-size: 18px;
+            margin: 10px 0;
+            min-height: 30px;
+        }
+        
+        #controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        #check-button, #hint-button, #reset-button {
+            padding: 8px 16px;
+            font-size: 16px;
+        }
+        
+        #check-button {
+            background-color: #4ECDC4;
+        }
+        
+        #hint-button {
+            background-color: #FFD166;
+            color: #333;
+        }
+        
+        #reset-button {
+            background-color: #FF6B6B;
+        }
+        
+        #feedback {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+            min-height: 30px;
+        }
+        
+        .correct {
+            color: #4ECDC4;
+        }
+        
+        .incorrect {
+            color: #FF6B6B;
+        }
+        
+        #timer {
+            width: 100%;
+            height: 8px;
+            background-color: #333;
+            margin: 10px 0;
+        }
+        
+        #timer-progress {
+            height: 100%;
+            background-color: #FFD166;
+            width: 100%;
+            transition: width 0.1s linear;
+        }
+        
+        #difficulty-display {
+            color: #FFD166;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
-    <div class="judul">
-        <span>G</span>
-        <span>A</span>
-        <span>M</span>
-        <span>E</span>
-        <span>2</span>
-    </div><br>
+    <div id="game-container">
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen">
+            <h1>Word Builder</h1>
+            <p>Arrange the letters to spell the word shown in the picture!</p>
+            <p>You have 60 seconds to complete as many words as possible.</p>
+            <p>Words get longer as you progress!</p>
+            <button id="start-button">Start Game</button>
+        </div>
+        
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div id="score-container">Score: <span id="score">0</span> | Words: <span id="words-completed">0</span></div>
+            <div id="difficulty-display">Level: <span id="current-level">1</span></div>
+            <div id="timer">
+                <div id="timer-progress"></div>
+            </div>
+            <div id="word-image">🐱</div>
+            <div id="hint-container"></div>
+            <div id="current-word">_ _ _</div>
+            <div id="letters-container"></div>
+            <div id="feedback"></div>
+            <div id="controls">
+                <button id="check-button">Check</button>
+                <button id="hint-button">Hint</button>
+                <button id="reset-button">Reset</button>
+            </div>
+        </div>
+        
+        <!-- End Screen -->
+        <div id="end-screen" class="screen">
+            <h1>Game Over!</h1>
+            <h2>Your Score: <span id="final-score">0</span></h2>
+            <p>Words Completed: <span id="final-words">0</span></p>
+            <p>Highest Level: <span id="final-level">1</span></p>
+            <p id="performance-message"></p>
+            <button id="restart-button">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            score: 0,
+            wordsCompleted: 0,
+            timeLeft: 60,
+            timerInterval: null,
+            currentWord: null,
+            currentLetters: [],
+            selectedLetters: [],
+            gameActive: false,
+            hintsUsed: 0,
+            usedWords: new Set(),
+            currentLevel: 1,
+            maxLevel: 1
+        };
+        
+        // Expanded word list organized by difficulty
+        const wordsByDifficulty = {
+            1: [ // 3-letter words
+                { word: "CAT", hint: "A furry pet that meows", emoji: "🐱" },
+                { word: "DOG", hint: "A loyal pet that barks", emoji: "🐶" },
+                { word: "SUN", hint: "Bright star in the sky", emoji: "☀️" },
+                { word: "CAR", hint: "Vehicle with four wheels", emoji: "🚗" },
+                { word: "HAT", hint: "You wear it on your head", emoji: "🧢" },
+                { word: "BUG", hint: "Small insect", emoji: "🐛" },
+                { word: "BAT", hint: "Flying mammal", emoji: "🦇" },
+                { word: "EGG", hint: "Chickens lay these", emoji: "🥚" },
+                { word: "KEY", hint: "Opens doors", emoji: "🔑" },
+                { word: "CUP", hint: "You drink from it", emoji: "☕" },
+                { word: "PEN", hint: "Writing tool", emoji: "🖊️" },
+                { word: "BEE", hint: "Makes honey", emoji: "🐝" },
+                { word: "BOX", hint: "Square container", emoji: "📦" },
+                { word: "BED", hint: "You sleep in it", emoji: "🛏️" },
+                { word: "RED", hint: "Color of fire", emoji: "🔴" },
+                { word: "ICE", hint: "Frozen water", emoji: "🧊" }
+            ],
+            2: [ // 4-letter words
+                { word: "FISH", hint: "Swims in water", emoji: "🐠" },
+                { word: "BALL", hint: "Round object for playing", emoji: "⚽" },
+                { word: "CAKE", hint: "Sweet dessert", emoji: "🎂" },
+                { word: "BOOK", hint: "You read it", emoji: "📖" },
+                { word: "TREE", hint: "Has leaves and branches", emoji: "🌳" },
+                { word: "STAR", hint: "Twinkles in the night sky", emoji: "⭐" },
+                { word: "MOON", hint: "Shines at night", emoji: "🌙" },
+                { word: "SHIP", hint: "Floats on water", emoji: "🚢" },
+                { word: "BEAR", hint: "Large furry animal", emoji: "🐻" },
+                { word: "BIRD", hint: "Has wings and feathers", emoji: "🐦" },
+                { word: "DUCK", hint: "Swims and quacks", emoji: "🦆" },
+                { word: "FROG", hint: "Green hopping animal", emoji: "🐸" },
+                { word: "LION", hint: "King of the jungle", emoji: "🦁" },
+                { word: "MILK", hint: "White drink from cows", emoji: "🥛" },
+                { word: "ROCK", hint: "Hard stone", emoji: "🪨" },
+                { word: "DOOR", hint: "You walk through it", emoji: "🚪" },
+                { word: "SHOE", hint: "You wear it on your foot", emoji: "👟" },
+                { word: "RAIN", hint: "Water falling from sky", emoji: "🌧️" },
+                { word: "FIRE", hint: "Hot and bright", emoji: "🔥" },
+                { word: "BOAT", hint: "Small water vessel", emoji: "⛵" }
+            ],
+            3: [ // 5-letter words
+                { word: "HOUSE", hint: "You live in it", emoji: "🏠" },
+                { word: "APPLE", hint: "Red or green fruit", emoji: "🍎" },
+                { word: "HORSE", hint: "Large riding animal", emoji: "🐴" },
+                { word: "TRAIN", hint: "Runs on railroad tracks", emoji: "🚂" },
+                { word: "PLANE", hint: "Flies in the sky", emoji: "✈️" },
+                { word: "CHAIR", hint: "You sit on it", emoji: "🪑" },
+                { word: "TABLE", hint: "You eat at it", emoji: "🪑" },
+                { word: "CLOUD", hint: "Fluffy white in the sky", emoji: "☁️" },
+                { word: "BEACH", hint: "Sandy place by the ocean", emoji: "🏖️" },
+                { word: "PIZZA", hint: "Round food with toppings", emoji: "🍕" },
+                { word: "MUSIC", hint: "Sounds that make melodies", emoji: "🎵" },
+                { word: "LIGHT", hint: "Bright illumination", emoji: "💡" },
+                { word: "HEART", hint: "Pumps blood in your body", emoji: "❤️" },
+                { word: "SMILE", hint: "Happy facial expression", emoji: "😊" },
+                { word: "NIGHT", hint: "When it's dark outside", emoji: "🌙" },
+                { word: "GRASS", hint: "Green plants in yards", emoji: "🌱" },
+                { word: "MONEY", hint: "Used to buy things", emoji: "💰" },
+                { word: "EARTH", hint: "The planet we live on", emoji: "🌍" }
+            ],
+            4: [ // 6-letter words
+                { word: "SCHOOL", hint: "Place where you learn", emoji: "🏫" },
+                { word: "FLOWER", hint: "Colorful plant bloom", emoji: "🌸" },
+                { word: "GARDEN", hint: "Place where plants grow", emoji: "🌺" },
+                { word: "BRIDGE", hint: "Goes over water or roads", emoji: "🌉" },
+                { word: "CASTLE", hint: "Medieval fortress", emoji: "🏰" },
+                { word: "JUNGLE", hint: "Dense tropical forest", emoji: "🌴" },
+                { word: "MONKEY", hint: "Swings from trees", emoji: "🐒" },
+                { word: "RABBIT", hint: "Hops and has long ears", emoji: "🐰" },
+                { word: "SPIDER", hint: "Eight-legged creature", emoji: "🕷️" },
+                { word: "PENCIL", hint: "Writing tool with eraser", emoji: "✏️" },
+                { word: "COOKIE", hint: "Sweet baked treat", emoji: "🍪" },
+                { word: "BOTTLE", hint: "Container for liquids", emoji: "🍼" },
+                { word: "CAMERA", hint: "Takes pictures", emoji: "📷" },
+                { word: "WIZARD", hint: "Person who does magic", emoji: "🧙" },
+                { word: "PIRATE", hint: "Sails the seas for treasure", emoji: "🏴‍☠️" },
+                { word: "ROCKET", hint: "Flies to space", emoji: "🚀" }
+            ],
+            5: [ // 7+ letter words
+                { word: "RAINBOW", hint: "Colorful arc after rain", emoji: "🌈" },
+                { word: "BALLOON", hint: "Floats in the air", emoji: "🎈" },
+                { word: "DOLPHIN", hint: "Smart sea mammal", emoji: "🐬" },
+                { word: "GIRAFFE", hint: "Tallest animal", emoji: "🦒" },
+                { word: "ELEPHANT", hint: "Large animal with trunk", emoji: "🐘" },
+                { word: "PENGUIN", hint: "Black and white bird", emoji: "🐧" },
+                { word: "BICYCLE", hint: "Two-wheeled vehicle", emoji: "🚲" },
+                { word: "SANDWICH", hint: "Food between bread slices", emoji: "🥪" },
+                { word: "MONSTER", hint: "Scary creature", emoji: "👹" },
+                { word: "DINOSAUR", hint: "Ancient giant reptile", emoji: "🦕" },
+                { word: "TREASURE", hint: "Valuable hidden riches", emoji: "💎" },
+                { word: "PRINCESS", hint: "Royal daughter", emoji: "👸" },
+                { word: "FOOTBALL", hint: "Sport with oval ball", emoji: "🏈" },
+                { word: "BUTTERFLY", hint: "Colorful flying insect", emoji: "🦋" }
+            ]
+        };
+        
+        // DOM elements
+        const elements = {
+            startScreen: document.getElementById('start-screen'),
+            gameScreen: document.getElementById('game-screen'),
+            endScreen: document.getElementById('end-screen'),
+            startButton: document.getElementById('start-button'),
+            restartButton: document.getElementById('restart-button'),
+            wordImage: document.getElementById('word-image'),
+            hintContainer: document.getElementById('hint-container'),
+            currentWord: document.getElementById('current-word'),
+            lettersContainer: document.getElementById('letters-container'),
+            scoreDisplay: document.getElementById('score'),
+            wordsCompletedDisplay: document.getElementById('words-completed'),
+            finalScoreDisplay: document.getElementById('final-score'),
+            finalWordsDisplay: document.getElementById('final-words'),
+            finalLevelDisplay: document.getElementById('final-level'),
+            timerProgress: document.getElementById('timer-progress'),
+            feedback: document.getElementById('feedback'),
+            checkButton: document.getElementById('check-button'),
+            hintButton: document.getElementById('hint-button'),
+            resetButton: document.getElementById('reset-button'),
+            performanceMessage: document.getElementById('performance-message'),
+            currentLevelDisplay: document.getElementById('current-level')
+        };
+        
+        // Event listeners
+        elements.startButton.addEventListener('click', startGame);
+        elements.restartButton.addEventListener('click', startGame);
+        elements.checkButton.addEventListener('click', checkWord);
+        elements.hintButton.addEventListener('click', showHint);
+        elements.resetButton.addEventListener('click', resetWord);
+        
+        function startGame() {
+            // Reset game state
+            gameState.score = 0;
+            gameState.wordsCompleted = 0;
+            gameState.timeLeft = 60;
+            gameState.gameActive = true;
+            gameState.hintsUsed = 0;
+            gameState.usedWords = new Set();
+            gameState.currentLevel = 1;
+            gameState.maxLevel = 1;
+            
+            elements.scoreDisplay.textContent = gameState.score;
+            elements.wordsCompletedDisplay.textContent = gameState.wordsCompleted;
+            elements.currentLevelDisplay.textContent = gameState.currentLevel;
+            elements.timerProgress.style.width = '100%';
+            elements.feedback.textContent = '';
+            elements.hintContainer.textContent = '';
+            
+            // Show game screen
+            elements.startScreen.style.display = 'none';
+            elements.endScreen.style.display = 'none';
+            elements.gameScreen.style.display = 'flex';
+            
+            // Start timer
+            clearInterval(gameState.timerInterval);
+            gameState.timerInterval = setInterval(updateTimer, 100);
+            
+            // Generate first word
+            generateWord();
+        }
+        
+        function updateTimer() {
+            if (!gameState.gameActive) {
+                clearInterval(gameState.timerInterval);
+                return;
+            }
+            
+            gameState.timeLeft -= 0.1;
+            elements.timerProgress.style.width = `${Math.max(0, (gameState.timeLeft / 60) * 100)}%`;
+            
+            if (gameState.timeLeft <= 0) {
+                endGame();
+            }
+        }
+        
+        function generateWord() {
+            if (!gameState.gameActive) return;
+            
+            // Reset word state
+            gameState.selectedLetters = [];
+            elements.feedback.textContent = '';
+            elements.hintContainer.textContent = '';
+            
+            // Determine current level based on words completed
+            gameState.currentLevel = Math.min(5, Math.floor(gameState.wordsCompleted / 3) + 1);
+            gameState.maxLevel = Math.max(gameState.maxLevel, gameState.currentLevel);
+            elements.currentLevelDisplay.textContent = gameState.currentLevel;
+            
+            // Get available words for current level
+            const availableWords = wordsByDifficulty[gameState.currentLevel].filter(word => 
+                !gameState.usedWords.has(word.word)
+            );
+            
+            // If no unused words at current level, reset used words for this level
+            if (availableWords.length === 0) {
+                // Reset used words for current level only
+                wordsByDifficulty[gameState.currentLevel].forEach(word => {
+                    gameState.usedWords.delete(word.word);
+                });
+                availableWords.push(...wordsByDifficulty[gameState.currentLevel]);
+            }
+            
+            // Select a random word from available words
+            const randomIndex = Math.floor(Math.random() * availableWords.length);
+            gameState.currentWord = availableWords[randomIndex];
+            gameState.usedWords.add(gameState.currentWord.word);
+            
+            // Display word image
+            elements.wordImage.textContent = gameState.currentWord.emoji;
+            elements.currentWord.textContent = '_ '.repeat(gameState.currentWord.word.length).trim();
+            
+            // Create scrambled letters
+            scrambleLetters();
+        }
+        
+        function scrambleLetters() {
+            // Clear previous letters
+            elements.lettersContainer.innerHTML = '';
+            
+            // Create array of letters from the word
+            let letters = gameState.currentWord.word.split('');
+            
+            // Add extra random letters based on difficulty
+            const extraLetters = Math.min(4, gameState.currentLevel + 1);
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            
+            for (let i = 0; i < extraLetters; i++) {
+                let randomLetter;
+                let attempts = 0;
+                do {
+                    randomLetter = alphabet[Math.floor(Math.random() * alphabet.length)];
+                    attempts++;
+                } while (letters.includes(randomLetter) && attempts < 10);
+                
+                letters.push(randomLetter);
+            }
+            
+            // Shuffle the letters
+            shuffleArray(letters);
+            gameState.currentLetters = letters;
+            
+            // Create letter elements
+            letters.forEach(letter => {
+                const letterElement = document.createElement('div');
+                letterElement.className = 'letter';
+                letterElement.textContent = letter;
+                letterElement.addEventListener('click', () => selectLetter(letter, letterElement));
+                elements.lettersContainer.appendChild(letterElement);
+            });
+        }
+        
+        function selectLetter(letter, element) {
+            if (!gameState.gameActive || element.classList.contains('used')) return;
+            
+            // Check if we can add more letters
+            if (gameState.selectedLetters.length >= gameState.currentWord.word.length) return;
+            
+            // Add letter to selected letters
+            gameState.selectedLetters.push(letter);
+            
+            // Update current word display
+            const wordDisplay = gameState.currentWord.word.split('').map((char, index) => {
+                return index < gameState.selectedLetters.length ? gameState.selectedLetters[index] : '_';
+            }).join(' ');
+            
+            elements.currentWord.textContent = wordDisplay;
+            
+            // Mark letter as used
+            element.classList.add('used');
+            
+            // Auto-check if word is complete
+            if (gameState.selectedLetters.length === gameState.currentWord.word.length) {
+                setTimeout(checkWord, 500);
+            }
+        }
+        
+        function checkWord() {
+            if (!gameState.gameActive) return;
+            
+            const attemptedWord = gameState.selectedLetters.join('');
+            
+            if (attemptedWord === gameState.currentWord.word) {
+                // Correct word - bonus points for higher levels
+                const basePoints = 50;
+                const levelBonus = (gameState.currentLevel - 1) * 25;
+                const totalPoints = basePoints + levelBonus;
+                
+                gameState.score += totalPoints;
+                gameState.wordsCompleted += 1;
+                gameState.hintsUsed = 0; // Reset hints for next word
+                
+                elements.scoreDisplay.textContent = gameState.score;
+                elements.wordsCompletedDisplay.textContent = gameState.wordsCompleted;
+                elements.feedback.textContent = `Correct! +${totalPoints} points`;
+                elements.feedback.className = 'correct';
+                
+                // Next word after delay
+                setTimeout(generateWord, 1500);
+            } else {
+                // Incorrect word
+                elements.feedback.textContent = 'Try again!';
+                elements.feedback.className = 'incorrect';
+                
+                // Reset word after delay
+                setTimeout(resetWord, 1000);
+            }
+        }
+        
+        function showHint() {
+            if (!gameState.gameActive || gameState.hintsUsed >= 2) return;
+            
+            gameState.hintsUsed += 1;
+            elements.hintContainer.textContent = gameState.currentWord.hint;
+            
+            // Reduce points for using hint (less penalty at higher levels)
+            const penalty = Math.max(5, 15 - (gameState.currentLevel * 2));
+            gameState.score = Math.max(0, gameState.score - penalty);
+            elements.scoreDisplay.textContent = gameState.score;
+        }
+        
+        function resetWord() {
+            if (!gameState.gameActive) return;
+            
+            // Reset selected letters
+            gameState.selectedLetters = [];
+            elements.currentWord.textContent = '_ '.repeat(gameState.currentWord.word.length).trim();
+            elements.feedback.textContent = '';
+            
+            // Reset letter elements
+            const letterElements = document.querySelectorAll('.letter');
+            letterElements.forEach(el => {
+                el.classList.remove('used');
+            });
+        }
+        
+        function endGame() {
+            gameState.gameActive = false;
+            clearInterval(gameState.timerInterval);
+            
+            // Update final scores
+            elements.finalScoreDisplay.textContent = gameState.score;
+            elements.finalWordsDisplay.textContent = gameState.wordsCompleted;
+            elements.finalLevelDisplay.textContent = gameState.maxLevel;
+            
+            // Performance message based on performance
+            if (gameState.wordsCompleted >= 15 && gameState.maxLevel >= 4) {
+                elements.performanceMessage.textContent = 'Incredible! You\'re a master word builder!';
+            } else if (gameState.wordsCompleted >= 10 && gameState.maxLevel >= 3) {
+                elements.performanceMessage.textContent = 'Amazing! You\'re a word wizard!';
+            } else if (gameState.wordsCompleted >= 6) {
+                elements.performanceMessage.textContent = 'Great job! You know your words!';
+            } else if (gameState.wordsCompleted >= 3) {
+                elements.performanceMessage.textContent = 'Good effort! Keep practicing!';
+            } else {
+                elements.performanceMessage.textContent = 'Nice try! You\'ll get better with practice!';
+            }
+            
+            // Show end screen
+            elements.gameScreen.style.display = 'none';
+            elements.endScreen.style.display = 'flex';
+        }
+        
+        // Utility function to shuffle array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // Add keyboard support
+        document.addEventListener('keydown', function(event) {
+            if (!gameState.gameActive) return;
+            
+            const key = event.key.toUpperCase();
+            const letterElements = document.querySelectorAll('.letter:not(.used)');
+            
+            // Find and click the first available letter that matches the key
+            for (let element of letterElements) {
+                if (element.textContent === key) {
+                    element.click();
+                    break;
+                }
+            }
+            
+            // Handle special keys
+            if (event.key === 'Enter') {
+                checkWord();
+            } else if (event.key === 'Backspace') {
+                resetWord();
+            }
+        });
+    </script>
 </body>
 </html>

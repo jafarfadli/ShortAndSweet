@@ -3,20 +3,669 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Courgette&family=Lobster&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>Color & Shape Sorter - Educational Mini-Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: black;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #game-container {
+            width: 500px;
+            height: 800px;
+            background-color: black;
+            border: 2px solid white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        #start-screen {
+            background-color: #1d3557;
+            color: white;
+        }
+        
+        #game-screen {
+            background-color: #1d3557;
+            display: none;
+            justify-content: flex-start;
+            padding-top: 20px;
+        }
+        
+        #end-screen {
+            background-color: #1d3557;
+            display: none;
+            color: white;
+        }
+        
+        h1 {
+            color: #e63946;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #a8dadc;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        
+        p {
+            font-size: 20px;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        button {
+            background-color: #e63946;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-family: inherit;
+        }
+        
+        button:hover {
+            background-color: #d90429;
+        }
+        
+        #score-container {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        #level-container {
+            color: #a8dadc;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        #timer {
+            width: 100%;
+            height: 8px;
+            background-color: #457b9d;
+            margin: 10px 0;
+        }
+        
+        #timer-progress {
+            height: 100%;
+            background-color: #e63946;
+            width: 100%;
+        }
+        
+        #category-display {
+            color: white;
+            font-size: 24px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        #items-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            min-height: 200px;
+        }
+        
+        .item {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            cursor: grab;
+            border: 2px dashed transparent;
+            transition: transform 0.2s;
+        }
+        
+        .item.dragging {
+            opacity: 0.7;
+            transform: scale(1.1);
+        }
+        
+        #buckets-container {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .bucket {
+            width: 120px;
+            height: 120px;
+            background-color: #457b9d;
+            border: 3px solid #a8dadc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+        
+        .bucket-label {
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        
+        .bucket-content {
+            font-size: 30px;
+            color: white;
+        }
+        
+        .bucket.correct {
+            border-color: #06d6a0;
+            background-color: #1b9d7c;
+        }
+        
+        .bucket.incorrect {
+            border-color: #e63946;
+            background-color: #b23a48;
+        }
+        
+        #feedback {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+            min-height: 30px;
+        }
+        
+        .correct {
+            color: #06d6a0;
+        }
+        
+        .incorrect {
+            color: #e63946;
+        }
+        
+        #progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: #457b9d;
+            margin: 10px 0;
+            position: relative;
+        }
+        
+        #progress-bar {
+            height: 100%;
+            background-color: #e63946;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        #progress-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 14px;
+            line-height: 20px;
+        }
+        
+        .item.correct {
+            border-color: #06d6a0;
+        }
+        
+        .item.incorrect {
+            border-color: #e63946;
+        }
+    </style>
 </head>
 <body>
-    <div class="judul">
-        <span>G</span>
-        <span>A</span>
-        <span>M</span>
-        <span>E</span>
-        <span>4</span>
-    </div><br>
+    <div id="game-container">
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen">
+            <h1>Color & Shape Sorter</h1>
+            <p>Drag and drop items into the correct categories!</p>
+            <p>Sort by color, shape, or type before time runs out.</p>
+            <button id="start-button">Start Game</button>
+        </div>
+        
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div id="score-container">Score: <span id="score">0</span></div>
+            <div id="level-container">Level: <span id="level">1</span> | Items: <span id="items-sorted">0</span>/<span id="total-items">0</span></div>
+            <div id="timer">
+                <div id="timer-progress"></div>
+            </div>
+            <div id="category-display">Sort by: <span id="category">Color</span></div>
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+                <div id="progress-text">Progress: 0%</div>
+            </div>
+            <div id="items-container"></div>
+            <div id="buckets-container"></div>
+            <div id="feedback"></div>
+        </div>
+        
+        <!-- End Screen -->
+        <div id="end-screen" class="screen">
+            <h1>Game Over!</h1>
+            <h2>Your Score: <span id="final-score">0</span></h2>
+            <p>Level Reached: <span id="final-level">1</span></p>
+            <p>Items Sorted: <span id="final-items">0</span></p>
+            <p id="performance-message"></p>
+            <button id="restart-button">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            score: 0,
+            level: 1,
+            itemsSorted: 0,
+            totalItems: 0,
+            timeLeft: 60,
+            timerInterval: null,
+            gameActive: false,
+            currentCategory: null,
+            items: [],
+            buckets: []
+        };
+        
+        // Categories and items
+        const categories = [
+            {
+                name: "Color",
+                buckets: [
+                    { name: "Red", identifier: "red", emoji: "🔴" },
+                    { name: "Blue", identifier: "blue", emoji: "🔵" },
+                    { name: "Green", identifier: "green", emoji: "🟢" },
+                    { name: "Yellow", identifier: "yellow", emoji: "🟡" }
+                ],
+                items: [
+                    { emoji: "🍎", category: "red" },
+                    { emoji: "🚒", category: "red" },
+                    { emoji: "🌹", category: "red" },
+                    { emoji: "🔴", category: "red" },
+                    { emoji: "🐳", category: "blue" },
+                    { emoji: "💧", category: "blue" },
+                    { emoji: "👖", category: "blue" },
+                    { emoji: "🔵", category: "blue" },
+                    { emoji: "🐸", category: "green" },
+                    { emoji: "🌲", category: "green" },
+                    { emoji: "🥦", category: "green" },
+                    { emoji: "🟢", category: "green" },
+                    { emoji: "🍌", category: "yellow" },
+                    { emoji: "🌞", category: "yellow" },
+                    { emoji: "🐥", category: "yellow" },
+                    { emoji: "🟡", category: "yellow" }
+                ]
+            },
+            {
+                name: "Shape",
+                buckets: [
+                    { name: "Round", identifier: "round", emoji: "⭕" },
+                    { name: "Square", identifier: "square", emoji: "⬜" },
+                    { name: "Triangle", identifier: "triangle", emoji: "🔺" },
+                    { name: "Star", identifier: "star", emoji: "⭐" }
+                ],
+                items: [
+                    { emoji: "⚽", category: "round" },
+                    { emoji: "🍩", category: "round" },
+                    { emoji: "⭕", category: "round" },
+                    { emoji: "🍕", category: "round" },
+                    { emoji: "📦", category: "square" },
+                    { emoji: "🧊", category: "square" },
+                    { emoji: "⬜", category: "square" },
+                    { emoji: "📺", category: "square" },
+                    { emoji: "🔺", category: "triangle" },
+                    { emoji: "⛰️", category: "triangle" },
+                    { emoji: "🎸", category: "triangle" },
+                    { emoji: "📐", category: "triangle" },
+                    { emoji: "⭐", category: "star" },
+                    { emoji: "🌟", category: "star" },
+                    { emoji: "🔯", category: "star" },
+                    { emoji: "🎖️", category: "star" }
+                ]
+            },
+            {
+                name: "Type",
+                buckets: [
+                    { name: "Animals", identifier: "animal", emoji: "🐾" },
+                    { name: "Food", identifier: "food", emoji: "🍎" },
+                    { name: "Vehicles", identifier: "vehicle", emoji: "🚗" },
+                    { name: "Nature", identifier: "nature", emoji: "🌳" }
+                ],
+                items: [
+                    { emoji: "🐶", category: "animal" },
+                    { emoji: "🐱", category: "animal" },
+                    { emoji: "🐰", category: "animal" },
+                    { emoji: "🐦", category: "animal" },
+                    { emoji: "🍎", category: "food" },
+                    { emoji: "🍕", category: "food" },
+                    { emoji: "🍦", category: "food" },
+                    { emoji: "🍩", category: "food" },
+                    { emoji: "🚗", category: "vehicle" },
+                    { emoji: "✈️", category: "vehicle" },
+                    { emoji: "🚲", category: "vehicle" },
+                    { emoji: "🚀", category: "vehicle" },
+                    { emoji: "🌳", category: "nature" },
+                    { emoji: "🌺", category: "nature" },
+                    { emoji: "⛰️", category: "nature" },
+                    { emoji: "🌊", category: "nature" }
+                ]
+            }
+        ];
+        
+        // DOM elements
+        const elements = {
+            startScreen: document.getElementById('start-screen'),
+            gameScreen: document.getElementById('game-screen'),
+            endScreen: document.getElementById('end-screen'),
+            startButton: document.getElementById('start-button'),
+            restartButton: document.getElementById('restart-button'),
+            itemsContainer: document.getElementById('items-container'),
+            bucketsContainer: document.getElementById('buckets-container'),
+            scoreDisplay: document.getElementById('score'),
+            levelDisplay: document.getElementById('level'),
+            itemsSortedDisplay: document.getElementById('items-sorted'),
+            totalItemsDisplay: document.getElementById('total-items'),
+            finalScoreDisplay: document.getElementById('final-score'),
+            finalLevelDisplay: document.getElementById('final-level'),
+            finalItemsDisplay: document.getElementById('final-items'),
+            timerProgress: document.getElementById('timer-progress'),
+            feedback: document.getElementById('feedback'),
+            categoryDisplay: document.getElementById('category'),
+            progressBar: document.getElementById('progress-bar'),
+            progressText: document.getElementById('progress-text'),
+            performanceMessage: document.getElementById('performance-message')
+        };
+        
+        // Event listeners
+        elements.startButton.addEventListener('click', startGame);
+        elements.restartButton.addEventListener('click', startGame);
+        
+        function startGame() {
+            // Reset game state
+            gameState.score = 0;
+            gameState.level = 1;
+            gameState.itemsSorted = 0;
+            gameState.timeLeft = 60;
+            gameState.gameActive = true;
+            
+            elements.scoreDisplay.textContent = gameState.score;
+            elements.levelDisplay.textContent = gameState.level;
+            elements.timerProgress.style.width = '100%';
+            elements.feedback.textContent = '';
+            elements.progressBar.style.width = '0%';
+            elements.progressText.textContent = 'Progress: 0%';
+            
+            // Show game screen
+            elements.startScreen.style.display = 'none';
+            elements.endScreen.style.display = 'none';
+            elements.gameScreen.style.display = 'flex';
+            
+            // Start timer
+            clearInterval(gameState.timerInterval);
+            gameState.timerInterval = setInterval(updateTimer, 100);
+            
+            // Start first level
+            startLevel();
+        }
+        
+        function updateTimer() {
+            if (!gameState.gameActive) return;
+            
+            gameState.timeLeft -= 0.1;
+            elements.timerProgress.style.width = `${(gameState.timeLeft / 60) * 100}%`;
+            
+            if (gameState.timeLeft <= 0) {
+                endGame();
+            }
+        }
+        
+        function startLevel() {
+            // Select a random category
+            const categoryIndex = Math.floor(Math.random() * categories.length);
+            gameState.currentCategory = categories[categoryIndex];
+            
+            // Update display
+            elements.categoryDisplay.textContent = gameState.currentCategory.name;
+            
+            // Determine number of items based on level
+            const itemsPerLevel = Math.min(4 + gameState.level, 12);
+            gameState.totalItems = itemsPerLevel;
+            gameState.itemsSorted = 0;
+            
+            elements.itemsSortedDisplay.textContent = gameState.itemsSorted;
+            elements.totalItemsDisplay.textContent = gameState.totalItems;
+            
+            // Create items and buckets
+            createItems();
+            createBuckets();
+            
+            // Update progress
+            updateProgress();
+        }
+        
+        function createItems() {
+            // Clear previous items
+            elements.itemsContainer.innerHTML = '';
+            gameState.items = [];
+            
+            // Select random items from the current category
+            const shuffledItems = shuffleArray([...gameState.currentCategory.items]);
+            const selectedItems = shuffledItems.slice(0, gameState.totalItems);
+            
+            // Create item elements
+            selectedItems.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'item';
+                itemElement.textContent = item.emoji;
+                itemElement.draggable = true;
+                itemElement.dataset.category = item.category;
+                
+                // Drag event handlers
+                itemElement.addEventListener('dragstart', handleDragStart);
+                itemElement.addEventListener('dragend', handleDragEnd);
+                
+                elements.itemsContainer.appendChild(itemElement);
+                gameState.items.push(itemElement);
+            });
+        }
+        
+        function createBuckets() {
+            // Clear previous buckets
+            elements.bucketsContainer.innerHTML = '';
+            gameState.buckets = [];
+            
+            // Create bucket elements
+            gameState.currentCategory.buckets.forEach(bucket => {
+                const bucketElement = document.createElement('div');
+                bucketElement.className = 'bucket';
+                bucketElement.dataset.category = bucket.identifier;
+                
+                const labelElement = document.createElement('div');
+                labelElement.className = 'bucket-label';
+                labelElement.textContent = bucket.name;
+                
+                const contentElement = document.createElement('div');
+                contentElement.className = 'bucket-content';
+                contentElement.textContent = bucket.emoji;
+                
+                // Drop event handlers
+                bucketElement.addEventListener('dragover', handleDragOver);
+                bucketElement.addEventListener('drop', handleDrop);
+                
+                bucketElement.appendChild(labelElement);
+                bucketElement.appendChild(contentElement);
+                elements.bucketsContainer.appendChild(bucketElement);
+                gameState.buckets.push(bucketElement);
+            });
+        }
+        
+        function handleDragStart(e) {
+            if (!gameState.gameActive) return;
+            
+            e.dataTransfer.setData('text/plain', e.target.dataset.category);
+            e.target.classList.add('dragging');
+            
+            // Clear any previous feedback
+            elements.feedback.textContent = '';
+            
+            // Reset bucket styles
+            gameState.buckets.forEach(bucket => {
+                bucket.classList.remove('correct', 'incorrect');
+            });
+        }
+        
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault(); // Necessary to allow drop
+        }
+        
+        function handleDrop(e) {
+            if (!gameState.gameActive) return;
+            
+            e.preventDefault();
+            const draggedCategory = e.dataTransfer.getData('text/plain');
+            const targetCategory = e.currentTarget.dataset.category;
+            
+            // Find the dragging element
+            const draggingElement = document.querySelector('.item.dragging');
+            
+            if (!draggingElement) return;
+            
+            // Check if the drop is correct
+            if (draggedCategory === targetCategory) {
+                // Correct sorting
+                gameState.score += 10 * gameState.level;
+                gameState.itemsSorted++;
+                
+                elements.scoreDisplay.textContent = gameState.score;
+                elements.itemsSortedDisplay.textContent = gameState.itemsSorted;
+                elements.feedback.textContent = 'Correct! +' + (10 * gameState.level) + ' points';
+                elements.feedback.className = 'correct';
+                
+                e.currentTarget.classList.add('correct');
+                draggingElement.classList.add('correct');
+                
+                // Remove the item after a delay
+                setTimeout(() => {
+                    draggingElement.style.visibility = 'hidden';
+                    draggingElement.style.pointerEvents = 'none';
+                }, 500);
+                
+                // Check if level is complete
+                if (gameState.itemsSorted >= gameState.totalItems) {
+                    setTimeout(completeLevel, 1000);
+                }
+            } else {
+                // Incorrect sorting
+                elements.feedback.textContent = 'Try again!';
+                elements.feedback.className = 'incorrect';
+                
+                e.currentTarget.classList.add('incorrect');
+                draggingElement.classList.add('incorrect');
+                
+                // Reset styles after a delay
+                setTimeout(() => {
+                    e.currentTarget.classList.remove('incorrect');
+                    draggingElement.classList.remove('incorrect');
+                }, 1000);
+            }
+            
+            // Update progress
+            updateProgress();
+        }
+        
+        function updateProgress() {
+            const progress = (gameState.itemsSorted / gameState.totalItems) * 100;
+            elements.progressBar.style.width = progress + '%';
+            elements.progressText.textContent = 'Progress: ' + Math.round(progress) + '%';
+        }
+        
+        function completeLevel() {
+            if (!gameState.gameActive) return;
+            
+            // Level completion bonus
+            gameState.score += Math.floor(gameState.timeLeft) * 2;
+            elements.scoreDisplay.textContent = gameState.score;
+            
+            // Increase level
+            gameState.level++;
+            elements.levelDisplay.textContent = gameState.level;
+            
+            // Reset timer for next level
+            gameState.timeLeft = 60;
+            elements.timerProgress.style.width = '100%';
+            
+            // Start next level
+            setTimeout(startLevel, 1500);
+        }
+        
+        function endGame() {
+            gameState.gameActive = false;
+            clearInterval(gameState.timerInterval);
+            
+            // Update final score
+            elements.finalScoreDisplay.textContent = gameState.score;
+            elements.finalLevelDisplay.textContent = gameState.level - 1;
+            elements.finalItemsDisplay.textContent = gameState.itemsSorted;
+            
+            // Performance message
+            if (gameState.level > 5) {
+                elements.performanceMessage.textContent = 'Amazing! You\'re a sorting expert!';
+            } else if (gameState.level > 3) {
+                elements.performanceMessage.textContent = 'Great job! You have good categorization skills!';
+            } else if (gameState.level > 1) {
+                elements.performanceMessage.textContent = 'Good effort! Keep practicing!';
+            } else {
+                elements.performanceMessage.textContent = 'Nice try! Sorting gets easier with practice!';
+            }
+            
+            // Show end screen
+            elements.gameScreen.style.display = 'none';
+            elements.endScreen.style.display = 'flex';
+        }
+        
+        // Utility function to shuffle array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+    </script>
 </body>
 </html>

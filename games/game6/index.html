@@ -3,20 +3,743 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Courgette&family=Lobster&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>Number Sequence - Educational Mini-Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: black;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #game-container {
+            width: 500px;
+            height: 800px;
+            background-color: black;
+            border: 2px solid white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        #start-screen {
+            background-color: #1a3a2a;
+            color: white;
+        }
+        
+        #game-screen {
+            background-color: #1a3a2a;
+            display: none;
+            justify-content: flex-start;
+            padding-top: 25px;
+        }
+        
+        #end-screen {
+            background-color: #1a3a2a;
+            display: none;
+            color: white;
+        }
+        
+        h1 {
+            color: #27AE60;
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(39, 174, 96, 0.7);
+        }
+        
+        h2 {
+            color: #F39C12;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        
+        p {
+            font-size: 20px;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        button {
+            background-color: #27AE60;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-family: inherit;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #229954;
+        }
+        
+        #sequence-container {
+            background-color: #2a4a3a;
+            width: 100%;
+            max-width: 420px;
+            margin: 20px auto;
+            padding: 25px;
+            border: 3px solid #27AE60;
+            border-radius: 15px;
+            min-height: 120px;
+        }
+        
+        #sequence-display {
+            font-size: 20px;
+            color: white;
+            font-weight: bold;
+            letter-spacing: 8px;
+            margin-bottom: 10px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #question-text {
+            font-size: 20px;
+            color: #F39C12;
+            margin: 15px 0;
+            min-height: 25px;
+        }
+        
+        #options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+            margin: 20px 0;
+        }
+        
+        .number-option {
+            background-color: #3498DB;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s;
+            border: 3px solid #2980B9;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+        }
+        
+        .number-option:hover {
+            background-color: #2E86C1;
+            transform: scale(1.05);
+        }
+        
+        .number-option.correct {
+            background-color: #27AE60;
+            border-color: #229954;
+        }
+        
+        .number-option.incorrect {
+            background-color: #E74C3C;
+            border-color: #C0392B;
+        }
+        
+        .number-option.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        #score-container {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        #difficulty-display {
+            color: #F39C12;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        
+        #timer {
+            width: 100%;
+            height: 10px;
+            background-color: #333;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        #timer-progress {
+            height: 100%;
+            background-color: #F39C12;
+            width: 100%;
+            transition: width 0.1s linear;
+            border-radius: 5px;
+        }
+        
+        #feedback {
+            font-size: 26px;
+            font-weight: bold;
+            margin: 15px 0;
+            min-height: 35px;
+        }
+        
+        .correct {
+            color: #27AE60;
+        }
+        
+        .incorrect {
+            color: #E74C3C;
+        }
+        
+        #hint-container {
+            color: #A569BD;
+            font-size: 16px;
+            margin: 10px 0;
+            min-height: 20px;
+        }
+        
+        #streak-display {
+            color: #E67E22;
+            font-size: 18px;
+            margin: 5px 0;
+        }
+        
+        .pulse {
+            animation: pulse 0.6s ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .missing-number {
+            color: #E74C3C;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <div class="judul">
-        <span>G</span>
-        <span>A</span>
-        <span>M</span>
-        <span>E</span>
-        <span>6</span>
-    </div><br>
+    <div id="game-container">
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen">
+            <h1>Number Sequence</h1>
+            <p>Find the missing number in each sequence!</p>
+            <p>Learn patterns, counting, and basic math operations.</p>
+            <p>You have 55 seconds to solve as many sequences as possible!</p>
+            <button id="start-button">Start Game</button>
+        </div>
+        
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div id="score-container">
+                Score: <span id="score">0</span> | Solved: <span id="sequences-completed">0</span>
+            </div>
+            <div id="difficulty-display">Level: <span id="current-level">1</span></div>
+            <div id="streak-display">Streak: <span id="current-streak">0</span></div>
+            <div id="timer">
+                <div id="timer-progress"></div>
+            </div>
+            
+            <div id="sequence-container">
+                <div id="sequence-display">2, 4, 6, ?, 10</div>
+                <div id="question-text">What number comes next?</div>
+            </div>
+            
+            <div id="hint-container"></div>
+            
+            <div id="options-container"></div>
+            
+            <div id="feedback"></div>
+        </div>
+        
+        <!-- End Screen -->
+        <div id="end-screen" class="screen">
+            <h1>Game Over!</h1>
+            <h2>Your Score: <span id="final-score">0</span></h2>
+            <p>Sequences Solved: <span id="final-sequences">0</span></p>
+            <p>Best Streak: <span id="final-streak">0</span></p>
+            <p>Highest Level: <span id="final-level">1</span></p>
+            <p id="performance-message"></p>
+            <button id="restart-button">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            score: 0,
+            sequencesCompleted: 0,
+            timeLeft: 55,
+            timerInterval: null,
+            currentSequence: null,
+            gameActive: false,
+            currentLevel: 1,
+            maxLevel: 1,
+            currentStreak: 0,
+            bestStreak: 0,
+            isAnswerProcessing: false,
+            usedSequences: new Set()
+        };
+        
+        // Sequence patterns organized by difficulty
+        const sequencesByDifficulty = {
+            1: [ // Simple counting and basic addition
+                {
+                    generate: () => {
+                        const start = Math.floor(Math.random() * 5) + 1;
+                        return {
+                            sequence: [start, start + 1, start + 2, start + 3, start + 4],
+                            missingIndex: Math.floor(Math.random() * 5),
+                            pattern: "Counting by 1",
+                            hint: "Each number increases by 1"
+                        };
+                    }
+                },
+                {
+                    generate: () => {
+                        const start = Math.floor(Math.random() * 3) * 2 + 2;
+                        return {
+                            sequence: [start, start + 2, start + 4, start + 6, start + 8],
+                            missingIndex: Math.floor(Math.random() * 5),
+                            pattern: "Counting by 2",
+                            hint: "Each number increases by 2"
+                        };
+                    }
+                },
+                {
+                    generate: () => {
+                        const start = Math.floor(Math.random() * 2) * 5 + 5;
+                        return {
+                            sequence: [start, start + 5, start + 10, start + 15, start + 20],
+                            missingIndex: Math.floor(Math.random() * 5),
+                            pattern: "Counting by 5",
+                            hint: "Each number increases by 5"
+                        };
+                    }
+                }
+            ],
+            2: [ // Basic multiplication tables
+                {
+                    generate: () => {
+                        const multiplier = Math.floor(Math.random() * 4) + 2; // 2-5
+                        const start = Math.floor(Math.random() * 3) + 1;
+                        return {
+                            sequence: [start * multiplier, (start + 1) * multiplier, (start + 2) * multiplier, (start + 3) * multiplier, (start + 4) * multiplier],
+                            missingIndex: Math.floor(Math.random() * 5),
+                            pattern: `Times ${multiplier} table`,
+                            hint: `Each number is multiplied by ${multiplier}`
+                        };
+                    }
+                },
+                {
+                    generate: () => {
+                        const step = Math.floor(Math.random() * 3) + 3; // 3-5
+                        const start = Math.floor(Math.random() * 5) + 1;
+                        return {
+                            sequence: [start, start + step, start + step * 2, start + step * 3, start + step * 4],
+                            missingIndex: Math.floor(Math.random() * 5),
+                            pattern: `Adding ${step}`,
+                            hint: `Each number increases by ${step}`
+                        };
+                    }
+                }
+            ],
+            3: [ // Subtraction and mixed operations
+                {
+                    generate: () => {
+                        const start = Math.floor(Math.random() * 10) + 20;
+                        const step = Math.floor(Math.random() * 3) + 2; // 2-4
+                        return {
+                            sequence: [start, start - step, start - step * 2, start - step * 3, start - step * 4],
+                            missingIndex: Math.floor(Math.random() * 5),
+                            pattern: `Subtracting ${step}`,
+                            hint: `Each number decreases by ${step}`
+                        };
+                    }
+                },
+                {
+                    generate: () => {
+                        const base = Math.floor(Math.random() * 5) + 2;
+                        return {
+                            sequence: [base, base * 2, base * 3, base * 4, base * 5],
+                            missingIndex: Math.floor(Math.random() * 5),
+                            pattern: `Multiples of ${base}`,
+                            hint: `Each position is ${base} times that position number`
+                        };
+                    }
+                }
+            ],
+            4: [ // Powers and squares
+                {
+                    generate: () => {
+                        const sequences = [
+                            { seq: [1, 4, 9, 16, 25], pattern: "Perfect squares", hint: "1², 2², 3², 4², 5²" },
+                            { seq: [2, 4, 8, 16, 32], pattern: "Powers of 2", hint: "Each number doubles" },
+                            { seq: [1, 3, 9, 27, 81], pattern: "Powers of 3", hint: "Each number triples" }
+                        ];
+                        const chosen = sequences[Math.floor(Math.random() * sequences.length)];
+                        return {
+                            sequence: chosen.seq,
+                            missingIndex: Math.floor(Math.random() * 5),
+                            pattern: chosen.pattern,
+                            hint: chosen.hint
+                        };
+                    }
+                },
+                {
+                    generate: () => {
+                        // Fibonacci-like sequences
+                        const a = Math.floor(Math.random() * 3) + 1;
+                        const b = Math.floor(Math.random() * 3) + 1;
+                        const seq = [a, b, a + b, a + 2*b, 2*a + 3*b];
+                        return {
+                            sequence: seq,
+                            missingIndex: Math.floor(Math.random() * 5),
+                            pattern: "Adding previous two",
+                            hint: "Each number is the sum of the two before it"
+                        };
+                    }
+                }
+            ],
+            5: [ // Complex patterns
+                {
+                    generate: () => {
+                        // Alternating operations
+                        const start = Math.floor(Math.random() * 5) + 5;
+                        const add = Math.floor(Math.random() * 3) + 2;
+                        const mult = 2;
+                        return {
+                            sequence: [start, start + add, (start + add) * mult, (start + add) * mult + add, ((start + add) * mult + add) * mult],
+                            missingIndex: Math.floor(Math.random() * 5),
+                            pattern: "Add then multiply",
+                            hint: `Add ${add}, then multiply by ${mult}, repeat`
+                        };
+                    }
+                },
+                {
+                    generate: () => {
+                        // Prime numbers or special sequences
+                        const sequences = [
+                            { seq: [2, 3, 5, 7, 11], pattern: "Prime numbers", hint: "Numbers only divisible by 1 and themselves" },
+                            { seq: [0, 1, 1, 2, 3], pattern: "Fibonacci start", hint: "Each number is sum of previous two" },
+                            { seq: [1, 1, 2, 6, 24], pattern: "Factorials", hint: "1!, 1!, 2!, 3!, 4!" }
+                        ];
+                        const chosen = sequences[Math.floor(Math.random() * sequences.length)];
+                        return {
+                            sequence: chosen.seq,
+                            missingIndex: Math.floor(Math.random() * 5),
+                            pattern: chosen.pattern,
+                            hint: chosen.hint
+                        };
+                    }
+                }
+            ]
+        };
+        
+        // DOM elements
+        const elements = {
+            startScreen: document.getElementById('start-screen'),
+            gameScreen: document.getElementById('game-screen'),
+            endScreen: document.getElementById('end-screen'),
+            startButton: document.getElementById('start-button'),
+            restartButton: document.getElementById('restart-button'),
+            sequenceDisplay: document.getElementById('sequence-display'),
+            questionText: document.getElementById('question-text'),
+            hintContainer: document.getElementById('hint-container'),
+            optionsContainer: document.getElementById('options-container'),
+            scoreDisplay: document.getElementById('score'),
+            sequencesCompletedDisplay: document.getElementById('sequences-completed'),
+            finalScoreDisplay: document.getElementById('final-score'),
+            finalSequencesDisplay: document.getElementById('final-sequences'),
+            finalStreakDisplay: document.getElementById('final-streak'),
+            finalLevelDisplay: document.getElementById('final-level'),
+            timerProgress: document.getElementById('timer-progress'),
+            feedback: document.getElementById('feedback'),
+            performanceMessage: document.getElementById('performance-message'),
+            currentLevelDisplay: document.getElementById('current-level'),
+            currentStreakDisplay: document.getElementById('current-streak')
+        };
+        
+        // Event listeners
+        elements.startButton.addEventListener('click', startGame);
+        elements.restartButton.addEventListener('click', startGame);
+        
+        function startGame() {
+            // Reset game state
+            gameState.score = 0;
+            gameState.sequencesCompleted = 0;
+            gameState.timeLeft = 55;
+            gameState.gameActive = true;
+            gameState.currentLevel = 1;
+            gameState.maxLevel = 1;
+            gameState.currentStreak = 0;
+            gameState.bestStreak = 0;
+            gameState.isAnswerProcessing = false;
+            gameState.usedSequences = new Set();
+            
+            elements.scoreDisplay.textContent = gameState.score;
+            elements.sequencesCompletedDisplay.textContent = gameState.sequencesCompleted;
+            elements.currentLevelDisplay.textContent = gameState.currentLevel;
+            elements.currentStreakDisplay.textContent = gameState.currentStreak;
+            elements.timerProgress.style.width = '100%';
+            elements.feedback.textContent = '';
+            elements.hintContainer.textContent = '';
+            
+            // Show game screen
+            elements.startScreen.style.display = 'none';
+            elements.endScreen.style.display = 'none';
+            elements.gameScreen.style.display = 'flex';
+            
+            // Start timer
+            clearInterval(gameState.timerInterval);
+            gameState.timerInterval = setInterval(updateTimer, 100);
+            
+            // Generate first sequence
+            generateSequence();
+        }
+        
+        function updateTimer() {
+            if (!gameState.gameActive) {
+                clearInterval(gameState.timerInterval);
+                return;
+            }
+            
+            gameState.timeLeft -= 0.1;
+            elements.timerProgress.style.width = `${Math.max(0, (gameState.timeLeft / 55) * 100)}%`;
+            
+            if (gameState.timeLeft <= 0) {
+                endGame();
+            }
+        }
+        
+        function generateSequence() {
+            if (!gameState.gameActive) return;
+            
+            // Reset processing flag
+            gameState.isAnswerProcessing = false;
+            
+            // Clear feedback
+            elements.feedback.textContent = '';
+            elements.feedback.className = '';
+            elements.hintContainer.textContent = '';
+            
+            // Determine current level based on sequences completed
+            gameState.currentLevel = Math.min(5, Math.floor(gameState.sequencesCompleted / 3) + 1);
+            gameState.maxLevel = Math.max(gameState.maxLevel, gameState.currentLevel);
+            elements.currentLevelDisplay.textContent = gameState.currentLevel;
+            
+            // Get sequence generators for current level
+            const generators = sequencesByDifficulty[gameState.currentLevel];
+            const randomGenerator = generators[Math.floor(Math.random() * generators.length)];
+            
+            // Generate sequence
+            gameState.currentSequence = randomGenerator.generate();
+            
+            // Create display string with missing number
+            displaySequence();
+            
+            // Set question text
+            const questionTypes = [
+                "What number is missing?",
+                "Find the missing number:",
+                "Complete the sequence:",
+                "What comes next?"
+            ];
+            elements.questionText.textContent = questionTypes[Math.floor(Math.random() * questionTypes.length)];
+            
+            // Generate answer options
+            generateOptions();
+        }
+        
+        function displaySequence() {
+            const sequence = gameState.currentSequence.sequence;
+            const missingIndex = gameState.currentSequence.missingIndex;
+            
+            const displayArray = sequence.map((num, index) => {
+                return index === missingIndex ? '?' : num.toString();
+            });
+            
+            elements.sequenceDisplay.innerHTML = displayArray.map(item => 
+                item === '?' ? `<span class="missing-number">${item}</span>` : item
+            ).join(', ');
+        }
+        
+        function generateOptions() {
+            // Clear previous options
+            elements.optionsContainer.innerHTML = '';
+            
+            const correctAnswer = gameState.currentSequence.sequence[gameState.currentSequence.missingIndex];
+            const options = [correctAnswer];
+            
+            // Generate wrong answers based on the correct answer
+            const range = Math.max(5, Math.floor(correctAnswer * 0.5));
+            
+            while (options.length < 4) {
+                const offset = (Math.floor(Math.random() * range * 2) - range);
+                let wrongAnswer = correctAnswer + offset;
+                
+                // Ensure positive numbers and no duplicates
+                if (wrongAnswer > 0 && wrongAnswer !== correctAnswer && !options.includes(wrongAnswer)) {
+                    options.push(wrongAnswer);
+                }
+            }
+            
+            // Shuffle options
+            shuffleArray(options);
+            
+            // Create option elements
+            options.forEach(answer => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'number-option';
+                optionElement.textContent = answer;
+                optionElement.addEventListener('click', () => checkAnswer(answer, optionElement));
+                elements.optionsContainer.appendChild(optionElement);
+            });
+        }
+        
+        function checkAnswer(selectedAnswer, optionElement) {
+            if (!gameState.gameActive || gameState.isAnswerProcessing) return;
+            
+            // Set processing flag
+            gameState.isAnswerProcessing = true;
+            
+            // Disable all options
+            const allOptions = document.querySelectorAll('.number-option');
+            allOptions.forEach(opt => {
+                opt.classList.add('disabled');
+            });
+            
+            const correctAnswer = gameState.currentSequence.sequence[gameState.currentSequence.missingIndex];
+            
+            if (selectedAnswer === correctAnswer) {
+                // Correct answer
+                const basePoints = 40;
+                const levelBonus = (gameState.currentLevel - 1) * 20;
+                const streakBonus = Math.min(gameState.currentStreak * 10, 80);
+                const totalPoints = basePoints + levelBonus + streakBonus;
+                
+                gameState.score += totalPoints;
+                gameState.sequencesCompleted += 1;
+                gameState.currentStreak += 1;
+                gameState.bestStreak = Math.max(gameState.bestStreak, gameState.currentStreak);
+                
+                elements.scoreDisplay.textContent = gameState.score;
+                elements.sequencesCompletedDisplay.textContent = gameState.sequencesCompleted;
+                elements.currentStreakDisplay.textContent = gameState.currentStreak;
+                
+                elements.feedback.textContent = `Excellent! +${totalPoints} points`;
+                elements.feedback.className = 'correct';
+                optionElement.classList.add('correct');
+                
+                // Add pulse animation
+                optionElement.classList.add('pulse');
+                
+                // Show pattern hint
+                elements.hintContainer.textContent = `Pattern: ${gameState.currentSequence.pattern}`;
+                
+                // Next sequence after delay
+                setTimeout(generateSequence, 2000);
+            } else {
+                // Wrong answer
+                gameState.currentStreak = 0;
+                elements.currentStreakDisplay.textContent = gameState.currentStreak;
+                
+                elements.feedback.textContent = 'Not quite right!';
+                elements.feedback.className = 'incorrect';
+                optionElement.classList.add('incorrect');
+                
+                // Highlight correct answer
+                allOptions.forEach(opt => {
+                    if (parseInt(opt.textContent) === correctAnswer) {
+                        opt.classList.add('correct');
+                    }
+                });
+                
+                // Show hint
+                elements.hintContainer.textContent = gameState.currentSequence.hint;
+                
+                // Next sequence after delay
+                setTimeout(generateSequence, 2500);
+            }
+        }
+        
+        function endGame() {
+            gameState.gameActive = false;
+            gameState.isAnswerProcessing = false;
+            clearInterval(gameState.timerInterval);
+            
+            // Update final scores
+            elements.finalScoreDisplay.textContent = gameState.score;
+            elements.finalSequencesDisplay.textContent = gameState.sequencesCompleted;
+            elements.finalStreakDisplay.textContent = gameState.bestStreak;
+            elements.finalLevelDisplay.textContent = gameState.maxLevel;
+            
+            // Performance message
+            if (gameState.sequencesCompleted >= 18 && gameState.maxLevel >= 4) {
+                elements.performanceMessage.textContent = 'Amazing! You\'re a pattern recognition master!';
+            } else if (gameState.sequencesCompleted >= 12 && gameState.maxLevel >= 3) {
+                elements.performanceMessage.textContent = 'Excellent! You have great math skills!';
+            } else if (gameState.sequencesCompleted >= 8) {
+                elements.performanceMessage.textContent = 'Great job! You\'re learning patterns well!';
+            } else if (gameState.sequencesCompleted >= 4) {
+                elements.performanceMessage.textContent = 'Good effort! Keep practicing sequences!';
+            } else {
+                elements.performanceMessage.textContent = 'Nice try! Pattern recognition takes practice!';
+            }
+            
+            // Show end screen
+            elements.gameScreen.style.display = 'none';
+            elements.endScreen.style.display = 'flex';
+        }
+        
+        // Utility function to shuffle array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // Add keyboard support
+        document.addEventListener('keydown', function(event) {
+            if (!gameState.gameActive || gameState.isAnswerProcessing) return;
+            
+            const options = document.querySelectorAll('.number-option:not(.disabled)');
+            if (event.key >= '1' && event.key <= '4') {
+                const index = parseInt(event.key) - 1;
+                if (options[index]) {
+                    options[index].click();
+                }
+            }
+        });
+    </script>
 </body>
 </html>

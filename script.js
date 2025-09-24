@@ -3,93 +3,66 @@
 const gameSources = [
     {
         src: "games/game1/index.html",
-        title: "Breakout Classic",
-        creator: "jafar",
+        title: "Math Challenge",
+        creator: "steve_pro",
         width: "500",
         height: "800",
-        categories: ["arcade", "casual"],
+        categories: ["math"],
         createdAt: "2024-01-15"
     },
     {
         src: "games/game2/index.html",
-        title: "Tetris",
-        creator: "jafar",
+        title: "Word Builder",
+        creator: "steve_pro",
         width: "500",
         height: "800",
-        categories: ["puzzle", "arcade"],
+        categories: ["puzzle", "word"],
         createdAt: "2024-01-20"
     },
     {
         src: "games/game3/index.html",
-        title: "Snake Game",
+        title: "Memory Match",
         creator: "alex_dev",
         width: "500",
         height: "800",
-        categories: ["arcade", "casual"],
+        categories: ["puzzle", "logic"],
         createdAt: "2024-02-01"
     },
     {
         src: "games/game4/index.html",
-        title: "Pac-Man",
+        title: "Color & Shape Sorter",
         creator: "retro_gamer",
         width: "500",
         height: "800",
-        categories: ["arcade", "action"],
+        categories: ["math", "logic","engineering"],
         createdAt: "2024-02-10"
     },
     {
         src: "games/game5/index.html",
-        title: "Space Invaders",
-        creator: "jafar",
+        title: "Shape Matching",
+        creator: "steve_pro",
         width: "500",
         height: "800",
-        categories: ["action", "arcade"],
+        categories: ["logic", "arcade"],
         createdAt: "2024-02-15"
     },
     {
         src: "games/game6/index.html",
-        title: "Frogger",
+        title: "Number Sequence",
         creator: "pixel_master",
         width: "500",
         height: "800",
-        categories: ["arcade", "casual"],
+        categories: ["math","engineering"],
         createdAt: "2024-02-20"
     },
     {
         src: "games/game7/index.html",
-        title: "Asteroids",
+        title: "Animal Habitat Match",
         creator: "space_fan",
         width: "500",
         height: "800",
-        categories: ["action", "arcade"],
+        categories: ["logic", "puzzle"],
         createdAt: "2024-03-01"
-    },
-    {
-        src: "games/game8/index.html",
-        title: "Centipede",
-        creator: "bug_hunter",
-        width: "500",
-        height: "800",
-        categories: ["arcade", "action"],
-        createdAt: "2024-03-05"
-    },
-    {
-        src: "games/game9/index.html",
-        title: "Pong",
-        creator: "classic_games",
-        width: "500",
-        height: "800",
-        categories: ["casual", "arcade"],
-        createdAt: "2024-03-10"
-    },
-    {
-        src: "games/game10/index.html",
-        title: "Missile Command",
-        creator: "jafar",
-        width: "500",
-        height: "800",
-        categories: ["action", "strategy"],
-        createdAt: "2024-03-15"
     }
 ];
 
@@ -97,22 +70,23 @@ const MASTER_GAME_SOURCES = [...gameSources];
 
 // Categories
 const categories = [
-    { id: 'arcade', name: 'Arcade', selected: true },
-    { id: 'puzzle', name: 'Puzzle', selected: true },
-    { id: 'action', name: 'Action', selected: true },
-    { id: 'strategy', name: 'Strategy', selected: true },
-    { id: 'casual', name: 'Casual', selected: true }
+    { id: 'math', name: 'math', selected: true },
+    { id: 'puzzle', name: 'puzzle', selected: true },
+    { id: 'logic', name: 'logic', selected: true },
+    { id: 'word', name: 'word', selected: true },
+    { id: 'language', name: 'language', selected: true },
+    { id: 'engineering', name: 'engineering', selected: true }
 ];
 
 // Dummy creator data
 const creators = {
-    'jafar': { name: 'jafar', avatar: 'JF', email: 'Game Developer', followers: 1200, following: 856, isFollowing: false },
-    'alex_dev': { name: 'alex_dev', avatar: 'AD', email: 'Indie Developer', followers: 543, following: 234, isFollowing: false },
-    'retro_gamer': { name: 'retro_gamer', avatar: 'RG', email: 'Retro Enthusiast', followers: 2100, following: 445, isFollowing: true },
-    'pixel_master': { name: 'pixel_master', avatar: 'PM', email: 'Pixel Artist', followers: 887, following: 123, isFollowing: false },
-    'space_fan': { name: 'space_fan', avatar: 'SF', email: 'Space Game Developer', followers: 654, following: 287, isFollowing: false },
-    'bug_hunter': { name: 'bug_hunter', avatar: 'BH', email: 'Bug Squasher', followers: 432, following: 165, isFollowing: false },
-    'classic_games': { name: 'classic_games', avatar: 'CG', email: 'Classic Game Lover', followers: 765, following: 298, isFollowing: false }
+    'steve_pro': { name: 'steve_pro', avatar: 'SP', email: 'sp@gmail.com', followers: 1200, following: 856, isFollowing: false },
+    'alex_dev': { name: 'alex_dev', avatar: 'AD', email: 'ad@gmail.com', followers: 543, following: 234, isFollowing: false },
+    'retro_gamer': { name: 'retro_gamer', avatar: 'RG', email: 'rg@gmail.com', followers: 2100, following: 445, isFollowing: true },
+    'pixel_master': { name: 'pixel_master', avatar: 'PM', email: 'pm@gmail.com', followers: 887, following: 123, isFollowing: false },
+    'space_fan': { name: 'space_fan', avatar: 'SF', email: 'sf@gmail.com', followers: 654, following: 287, isFollowing: false },
+    'bug_hunter': { name: 'bug_hunter', avatar: 'BH', email: 'bh@gmail.com', followers: 432, following: 165, isFollowing: false },
+    'classic_games': { name: 'classic_games', avatar: 'CG', email: 'cg@gmail.com', followers: 765, following: 298, isFollowing: false }
 };
 
 let isLoading = false;
@@ -124,7 +98,13 @@ let savedGames = [];
 let currentPlayingGame = null;
 let touchStartX = 0;
 let touchStartY = 0;
-let selectedCategories = new Set(['arcade', 'puzzle', 'action', 'strategy', 'casual']);
+let selectedCategories = new Set([
+    'math',
+    'puzzle',
+    'logic',
+    'word',
+    'language',
+    'engineering']);
 let createdGames = [];
 
 // DOM elements
@@ -143,8 +123,8 @@ const swipeLeftIndicator = document.getElementById('swipeLeftIndicator');
 const swipeRightIndicator = document.getElementById('swipeRightIndicator');
 
 const gameIcons = {
-    'Breakout Classic': 'BC', 'Tetris': 'T', 'Snake Game': 'SG', 'Pac-Man': 'PM', 'Space Invaders': 'SI',
-    'Frogger': 'F', 'Asteroids': 'A', 'Centipede': 'C', 'Pong': 'P', 'Missile Command': 'MC'
+    'Math Challenge': 'MC', 'Word Builder': 'WB', 'Memory Match': 'MM', 'Color & Shape Sorter': 'CSS', 'Shape Matching': 'SM',
+    'Number Sequence': 'NS', 'Animal Habitat Match': 'AHM'
 };
 
 function shuffleArray(array) {

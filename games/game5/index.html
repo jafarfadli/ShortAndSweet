@@ -3,20 +3,610 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Courgette&family=Lobster&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>Shape Matching - Educational Mini-Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: black;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #game-container {
+            width: 500px;
+            height: 800px;
+            background-color: black;
+            border: 2px solid white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        #start-screen {
+            background-color: #2a1a4a;
+            color: white;
+        }
+        
+        #game-screen {
+            background-color: #2a1a4a;
+            display: none;
+            justify-content: flex-start;
+            padding-top: 30px;
+        }
+        
+        #end-screen {
+            background-color: #2a1a4a;
+            display: none;
+            color: white;
+        }
+        
+        h1 {
+            color: #9B59B6;
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(155, 89, 182, 0.7);
+        }
+        
+        h2 {
+            color: #E74C3C;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        
+        p {
+            font-size: 20px;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        button {
+            background-color: #9B59B6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-family: inherit;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #8E44AD;
+        }
+        
+        #target-shape-container {
+            background-color: #3a2a6a;
+            width: 300px;
+            height: 200px;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #9B59B6;
+            border-radius: 10px;
+        }
+        
+        #target-shape {
+            font-size: 80px;
+            color: white;
+        }
+        
+        #shape-name {
+            font-size: 32px;
+            color: white;
+            margin: 20px 0;
+            min-height: 40px;
+        }
+        
+        #shapes-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+            margin: 20px 0;
+        }
+        
+        .shape-option {
+            background-color: #E74C3C;
+            color: white;
+            font-size: 60px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s;
+            border: 3px solid #C0392B;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+        }
+        
+        .shape-option:hover {
+            background-color: #D32F2F;
+            transform: scale(1.05);
+        }
+        
+        .shape-option.correct {
+            background-color: #27AE60;
+            border-color: #229954;
+        }
+        
+        .shape-option.incorrect {
+            background-color: #E74C3C;
+            border-color: #C0392B;
+        }
+        
+        .shape-option.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        #score-container {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        #difficulty-display {
+            color: #E74C3C;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        
+        #timer {
+            width: 100%;
+            height: 10px;
+            background-color: #333;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        #timer-progress {
+            height: 100%;
+            background-color: #E74C3C;
+            width: 100%;
+            transition: width 0.1s linear;
+            border-radius: 5px;
+        }
+        
+        #feedback {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 15px 0;
+            min-height: 35px;
+        }
+        
+        .correct {
+            color: #27AE60;
+        }
+        
+        .incorrect {
+            color: #E74C3C;
+        }
+        
+        #instruction {
+            color: #F39C12;
+            font-size: 20px;
+            margin-bottom: 10px;
+            min-height: 25px;
+        }
+        
+        #streak-display {
+            color: #F39C12;
+            font-size: 18px;
+            margin: 5px 0;
+        }
+        
+        .pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
 </head>
 <body>
-    <div class="judul">
-        <span>G</span>
-        <span>A</span>
-        <span>M</span>
-        <span>E</span>
-        <span>5</span>
-    </div><br>
+    <div id="game-container">
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen">
+            <h1>Shape Matching</h1>
+            <p>Look at the target shape and find its match!</p>
+            <p>Learn colors, shapes, and patterns while you play.</p>
+            <p>You have 50 seconds to match as many shapes as possible!</p>
+            <button id="start-button">Start Game</button>
+        </div>
+        
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div id="score-container">
+                Score: <span id="score">0</span> | Matches: <span id="matches-completed">0</span>
+            </div>
+            <div id="difficulty-display">Level: <span id="current-level">1</span></div>
+            <div id="streak-display">Streak: <span id="current-streak">0</span></div>
+            <div id="timer">
+                <div id="timer-progress"></div>
+            </div>
+            
+            <div id="instruction">Find the matching shape:</div>
+            
+            <div id="target-shape-container">
+                <div id="target-shape">🔴</div>
+            </div>
+            
+            <div id="shape-name">Red Circle</div>
+            
+            <div id="shapes-container"></div>
+            
+            <div id="feedback"></div>
+        </div>
+        
+        <!-- End Screen -->
+        <div id="end-screen" class="screen">
+            <h1>Game Over!</h1>
+            <h2>Your Score: <span id="final-score">0</span></h2>
+            <p>Shapes Matched: <span id="final-matches">0</span></p>
+            <p>Best Streak: <span id="final-streak">0</span></p>
+            <p>Highest Level: <span id="final-level">1</span></p>
+            <p id="performance-message"></p>
+            <button id="restart-button">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            score: 0,
+            matchesCompleted: 0,
+            timeLeft: 50,
+            timerInterval: null,
+            currentTarget: null,
+            gameActive: false,
+            currentLevel: 1,
+            maxLevel: 1,
+            currentStreak: 0,
+            bestStreak: 0,
+            isAnswerProcessing: false
+        };
+        
+        // Shape and pattern definitions organized by difficulty
+        const shapesByDifficulty = {
+            1: [ // Basic shapes and colors
+                { shape: "🔴", name: "Red Circle", category: "color" },
+                { shape: "🟡", name: "Yellow Circle", category: "color" },
+                { shape: "🔵", name: "Blue Circle", category: "color" },
+                { shape: "🟢", name: "Green Circle", category: "color" },
+                { shape: "🟠", name: "Orange Circle", category: "color" },
+                { shape: "🟣", name: "Purple Circle", category: "color" },
+                { shape: "⚫", name: "Black Circle", category: "color" },
+                { shape: "⚪", name: "White Circle", category: "color" }
+            ],
+            2: [ // Basic geometric shapes
+                { shape: "🔺", name: "Red Triangle", category: "shape" },
+                { shape: "🔷", name: "Blue Diamond", category: "shape" },
+                { shape: "🔸", name: "Orange Diamond", category: "shape" },
+                { shape: "🔹", name: "Blue Small Diamond", category: "shape" },
+                { shape: "🟥", name: "Red Square", category: "shape" },
+                { shape: "🟦", name: "Blue Square", category: "shape" },
+                { shape: "🟩", name: "Green Square", category: "shape" },
+                { shape: "🟨", name: "Yellow Square", category: "shape" },
+                { shape: "🟧", name: "Orange Square", category: "shape" },
+                { shape: "🟪", name: "Purple Square", category: "shape" }
+            ],
+            3: [ // Hearts and symbols
+                { shape: "❤️", name: "Red Heart", category: "symbol" },
+                { shape: "💛", name: "Yellow Heart", category: "symbol" },
+                { shape: "💙", name: "Blue Heart", category: "symbol" },
+                { shape: "💚", name: "Green Heart", category: "symbol" },
+                { shape: "🧡", name: "Orange Heart", category: "symbol" },
+                { shape: "💜", name: "Purple Heart", category: "symbol" },
+                { shape: "🖤", name: "Black Heart", category: "symbol" },
+                { shape: "🤍", name: "White Heart", category: "symbol" },
+                { shape: "⭐", name: "Star", category: "symbol" },
+                { shape: "✨", name: "Sparkles", category: "symbol" }
+            ],
+            4: [ // Animals and objects
+                { shape: "🐶", name: "Dog Face", category: "animal" },
+                { shape: "🐱", name: "Cat Face", category: "animal" },
+                { shape: "🐸", name: "Frog Face", category: "animal" },
+                { shape: "🐵", name: "Monkey Face", category: "animal" },
+                { shape: "🐧", name: "Penguin", category: "animal" },
+                { shape: "🦁", name: "Lion Face", category: "animal" },
+                { shape: "🐻", name: "Bear Face", category: "animal" },
+                { shape: "🐼", name: "Panda Face", category: "animal" },
+                { shape: "🐷", name: "Pig Face", category: "animal" },
+                { shape: "🐯", name: "Tiger Face", category: "animal" }
+            ],
+            5: [ // Complex patterns and objects
+                { shape: "🌟", name: "Glowing Star", category: "pattern" },
+                { shape: "🌈", name: "Rainbow", category: "pattern" },
+                { shape: "☀️", name: "Sun", category: "pattern" },
+                { shape: "🌙", name: "Crescent Moon", category: "pattern" },
+                { shape: "⚡", name: "Lightning Bolt", category: "pattern" },
+                { shape: "🔥", name: "Fire", category: "pattern" },
+                { shape: "💎", name: "Diamond Gem", category: "pattern" },
+                { shape: "🌸", name: "Cherry Blossom", category: "pattern" },
+                { shape: "🦋", name: "Butterfly", category: "pattern" },
+                { shape: "🌺", name: "Hibiscus", category: "pattern" }
+            ]
+        };
+        
+        // DOM elements
+        const elements = {
+            startScreen: document.getElementById('start-screen'),
+            gameScreen: document.getElementById('game-screen'),
+            endScreen: document.getElementById('end-screen'),
+            startButton: document.getElementById('start-button'),
+            restartButton: document.getElementById('restart-button'),
+            targetShape: document.getElementById('target-shape'),
+            shapeName: document.getElementById('shape-name'),
+            shapesContainer: document.getElementById('shapes-container'),
+            scoreDisplay: document.getElementById('score'),
+            matchesCompletedDisplay: document.getElementById('matches-completed'),
+            finalScoreDisplay: document.getElementById('final-score'),
+            finalMatchesDisplay: document.getElementById('final-matches'),
+            finalStreakDisplay: document.getElementById('final-streak'),
+            finalLevelDisplay: document.getElementById('final-level'),
+            timerProgress: document.getElementById('timer-progress'),
+            feedback: document.getElementById('feedback'),
+            performanceMessage: document.getElementById('performance-message'),
+            currentLevelDisplay: document.getElementById('current-level'),
+            currentStreakDisplay: document.getElementById('current-streak')
+        };
+        
+        // Event listeners
+        elements.startButton.addEventListener('click', startGame);
+        elements.restartButton.addEventListener('click', startGame);
+        
+        function startGame() {
+            // Reset game state
+            gameState.score = 0;
+            gameState.matchesCompleted = 0;
+            gameState.timeLeft = 50;
+            gameState.gameActive = true;
+            gameState.currentLevel = 1;
+            gameState.maxLevel = 1;
+            gameState.currentStreak = 0;
+            gameState.bestStreak = 0;
+            gameState.isAnswerProcessing = false;
+            
+            elements.scoreDisplay.textContent = gameState.score;
+            elements.matchesCompletedDisplay.textContent = gameState.matchesCompleted;
+            elements.currentLevelDisplay.textContent = gameState.currentLevel;
+            elements.currentStreakDisplay.textContent = gameState.currentStreak;
+            elements.timerProgress.style.width = '100%';
+            elements.feedback.textContent = '';
+            
+            // Show game screen
+            elements.startScreen.style.display = 'none';
+            elements.endScreen.style.display = 'none';
+            elements.gameScreen.style.display = 'flex';
+            
+            // Start timer
+            clearInterval(gameState.timerInterval);
+            gameState.timerInterval = setInterval(updateTimer, 100);
+            
+            // Generate first shape match
+            generateShapeMatch();
+        }
+        
+        function updateTimer() {
+            if (!gameState.gameActive) {
+                clearInterval(gameState.timerInterval);
+                return;
+            }
+            
+            gameState.timeLeft -= 0.1;
+            elements.timerProgress.style.width = `${Math.max(0, (gameState.timeLeft / 50) * 100)}%`;
+            
+            if (gameState.timeLeft <= 0) {
+                endGame();
+            }
+        }
+        
+        function generateShapeMatch() {
+            if (!gameState.gameActive) return;
+            
+            // Reset processing flag
+            gameState.isAnswerProcessing = false;
+            
+            // Clear feedback
+            elements.feedback.textContent = '';
+            elements.feedback.className = '';
+            
+            // Determine current level based on matches completed
+            gameState.currentLevel = Math.min(5, Math.floor(gameState.matchesCompleted / 4) + 1);
+            gameState.maxLevel = Math.max(gameState.maxLevel, gameState.currentLevel);
+            elements.currentLevelDisplay.textContent = gameState.currentLevel;
+            
+            // Get shapes for current level
+            const availableShapes = shapesByDifficulty[gameState.currentLevel];
+            
+            // Select target shape
+            const randomIndex = Math.floor(Math.random() * availableShapes.length);
+            gameState.currentTarget = availableShapes[randomIndex];
+            
+            // Display target shape
+            elements.targetShape.textContent = gameState.currentTarget.shape;
+            elements.shapeName.textContent = gameState.currentTarget.name;
+            
+            // Generate options
+            generateShapeOptions();
+        }
+        
+        function generateShapeOptions() {
+            // Clear previous options
+            elements.shapesContainer.innerHTML = '';
+            
+            const currentLevelShapes = shapesByDifficulty[gameState.currentLevel];
+            const options = [gameState.currentTarget];
+            
+            // Add wrong answers from current level
+            while (options.length < 4) {
+                const randomShape = currentLevelShapes[Math.floor(Math.random() * currentLevelShapes.length)];
+                if (!options.some(opt => opt.shape === randomShape.shape)) {
+                    options.push(randomShape);
+                }
+            }
+            
+            // If we need more options, pull from adjacent levels
+            if (options.length < 4) {
+                const allShapes = Object.values(shapesByDifficulty).flat();
+                while (options.length < 4) {
+                    const randomShape = allShapes[Math.floor(Math.random() * allShapes.length)];
+                    if (!options.some(opt => opt.shape === randomShape.shape)) {
+                        options.push(randomShape);
+                    }
+                }
+            }
+            
+            // Shuffle options
+            shuffleArray(options);
+            
+            // Create option elements
+            options.forEach(shapeData => {
+                const shapeElement = document.createElement('div');
+                shapeElement.className = 'shape-option';
+                shapeElement.textContent = shapeData.shape;
+                shapeElement.addEventListener('click', () => checkMatch(shapeData, shapeElement));
+                elements.shapesContainer.appendChild(shapeElement);
+            });
+        }
+        
+        function checkMatch(selectedShape, shapeElement) {
+            if (!gameState.gameActive || gameState.isAnswerProcessing) return;
+            
+            // Set processing flag
+            gameState.isAnswerProcessing = true;
+            
+            // Disable all options
+            const allOptions = document.querySelectorAll('.shape-option');
+            allOptions.forEach(opt => {
+                opt.classList.add('disabled');
+            });
+            
+            if (selectedShape.shape === gameState.currentTarget.shape) {
+                // Correct match
+                const basePoints = 30;
+                const levelBonus = (gameState.currentLevel - 1) * 15;
+                const streakBonus = Math.min(gameState.currentStreak * 5, 50);
+                const totalPoints = basePoints + levelBonus + streakBonus;
+                
+                gameState.score += totalPoints;
+                gameState.matchesCompleted += 1;
+                gameState.currentStreak += 1;
+                gameState.bestStreak = Math.max(gameState.bestStreak, gameState.currentStreak);
+                
+                elements.scoreDisplay.textContent = gameState.score;
+                elements.matchesCompletedDisplay.textContent = gameState.matchesCompleted;
+                elements.currentStreakDisplay.textContent = gameState.currentStreak;
+                
+                elements.feedback.textContent = `Perfect! +${totalPoints} points`;
+                elements.feedback.className = 'correct';
+                shapeElement.classList.add('correct');
+                
+                // Add pulse animation
+                shapeElement.classList.add('pulse');
+                
+                // Next match after delay
+                setTimeout(generateShapeMatch, 1500);
+            } else {
+                // Wrong match
+                gameState.currentStreak = 0;
+                elements.currentStreakDisplay.textContent = gameState.currentStreak;
+                
+                elements.feedback.textContent = 'Try again!';
+                elements.feedback.className = 'incorrect';
+                shapeElement.classList.add('incorrect');
+                
+                // Highlight correct answer
+                allOptions.forEach(opt => {
+                    if (opt.textContent === gameState.currentTarget.shape) {
+                        opt.classList.add('correct');
+                    }
+                });
+                
+                // Next match after delay
+                setTimeout(generateShapeMatch, 2000);
+            }
+        }
+        
+        function endGame() {
+            gameState.gameActive = false;
+            gameState.isAnswerProcessing = false;
+            clearInterval(gameState.timerInterval);
+            
+            // Update final scores
+            elements.finalScoreDisplay.textContent = gameState.score;
+            elements.finalMatchesDisplay.textContent = gameState.matchesCompleted;
+            elements.finalStreakDisplay.textContent = gameState.bestStreak;
+            elements.finalLevelDisplay.textContent = gameState.maxLevel;
+            
+            // Performance message
+            if (gameState.matchesCompleted >= 20 && gameState.maxLevel >= 4) {
+                elements.performanceMessage.textContent = 'Outstanding! You\'re a shape master!';
+            } else if (gameState.matchesCompleted >= 15 && gameState.maxLevel >= 3) {
+                elements.performanceMessage.textContent = 'Excellent! You know your shapes well!';
+            } else if (gameState.matchesCompleted >= 10) {
+                elements.performanceMessage.textContent = 'Great job! You\'re getting good at this!';
+            } else if (gameState.matchesCompleted >= 5) {
+                elements.performanceMessage.textContent = 'Good effort! Keep practicing!';
+            } else {
+                elements.performanceMessage.textContent = 'Nice try! You\'ll improve with practice!';
+            }
+            
+            // Show end screen
+            elements.gameScreen.style.display = 'none';
+            elements.endScreen.style.display = 'flex';
+        }
+        
+        // Utility function to shuffle array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // Add keyboard support
+        document.addEventListener('keydown', function(event) {
+            if (!gameState.gameActive || gameState.isAnswerProcessing) return;
+            
+            const options = document.querySelectorAll('.shape-option:not(.disabled)');
+            if (event.key >= '1' && event.key <= '4') {
+                const index = parseInt(event.key) - 1;
+                if (options[index]) {
+                    options[index].click();
+                }
+            }
+        });
+    </script>
 </body>
 </html>

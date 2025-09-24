@@ -144,7 +144,7 @@ body {
 /* Game Info - repositioned to align with buttons */
 .game-info {
     position: absolute;
-    bottom: max(calc(env(safe-area-inset-bottom, 20px) + 80px), 100px);
+    bottom: 15px;
     left: 15px;
     right: 15px;
     pointer-events: none;
