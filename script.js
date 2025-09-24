@@ -1,367 +1,154 @@
+
+// Game sources with multiple categories
 const gameSources = [
     {
         src: "games/game1/index.html",
         title: "Breakout Classic",
         creator: "jafar",
         width: "500",
-        height: "800"
+        height: "800",
+        categories: ["arcade", "casual"],
+        createdAt: "2024-01-15"
     },
     {
         src: "games/game2/index.html",
         title: "Tetris",
         creator: "jafar",
         width: "500",
-        height: "800"
+        height: "800",
+        categories: ["puzzle", "arcade"],
+        createdAt: "2024-01-20"
     },
     {
         src: "games/game3/index.html",
         title: "Snake Game",
-        creator: "jafar",
+        creator: "alex_dev",
         width: "500",
-        height: "800"
+        height: "800",
+        categories: ["arcade", "casual"],
+        createdAt: "2024-02-01"
     },
     {
         src: "games/game4/index.html",
         title: "Pac-Man",
-        creator: "jafar",
+        creator: "retro_gamer",
         width: "500",
-        height: "800"
+        height: "800",
+        categories: ["arcade", "action"],
+        createdAt: "2024-02-10"
     },
     {
         src: "games/game5/index.html",
         title: "Space Invaders",
         creator: "jafar",
         width: "500",
-        height: "800"
+        height: "800",
+        categories: ["action", "arcade"],
+        createdAt: "2024-02-15"
     },
     {
         src: "games/game6/index.html",
         title: "Frogger",
-        creator: "jafar",
+        creator: "pixel_master",
         width: "500",
-        height: "800"
+        height: "800",
+        categories: ["arcade", "casual"],
+        createdAt: "2024-02-20"
     },
     {
         src: "games/game7/index.html",
         title: "Asteroids",
-        creator: "jafar",
+        creator: "space_fan",
         width: "500",
-        height: "800"
+        height: "800",
+        categories: ["action", "arcade"],
+        createdAt: "2024-03-01"
     },
     {
         src: "games/game8/index.html",
         title: "Centipede",
-        creator: "jafar",
+        creator: "bug_hunter",
         width: "500",
-        height: "800"
+        height: "800",
+        categories: ["arcade", "action"],
+        createdAt: "2024-03-05"
     },
     {
         src: "games/game9/index.html",
         title: "Pong",
-        creator: "jafar",
+        creator: "classic_games",
         width: "500",
-        height: "800"
+        height: "800",
+        categories: ["casual", "arcade"],
+        createdAt: "2024-03-10"
     },
     {
         src: "games/game10/index.html",
         title: "Missile Command",
         creator: "jafar",
         width: "500",
-        height: "800"
+        height: "800",
+        categories: ["action", "strategy"],
+        createdAt: "2024-03-15"
     }
 ];
 
-let currentGameIndex = 0;
+const MASTER_GAME_SOURCES = [...gameSources];
+
+// Categories
+const categories = [
+    { id: 'arcade', name: 'Arcade', selected: true },
+    { id: 'puzzle', name: 'Puzzle', selected: true },
+    { id: 'action', name: 'Action', selected: true },
+    { id: 'strategy', name: 'Strategy', selected: true },
+    { id: 'casual', name: 'Casual', selected: true }
+];
+
+// Dummy creator data
+const creators = {
+    'jafar': { name: 'jafar', avatar: 'JF', email: 'Game Developer', followers: 1200, following: 856, isFollowing: false },
+    'alex_dev': { name: 'alex_dev', avatar: 'AD', email: 'Indie Developer', followers: 543, following: 234, isFollowing: false },
+    'retro_gamer': { name: 'retro_gamer', avatar: 'RG', email: 'Retro Enthusiast', followers: 2100, following: 445, isFollowing: true },
+    'pixel_master': { name: 'pixel_master', avatar: 'PM', email: 'Pixel Artist', followers: 887, following: 123, isFollowing: false },
+    'space_fan': { name: 'space_fan', avatar: 'SF', email: 'Space Game Developer', followers: 654, following: 287, isFollowing: false },
+    'bug_hunter': { name: 'bug_hunter', avatar: 'BH', email: 'Bug Squasher', followers: 432, following: 165, isFollowing: false },
+    'classic_games': { name: 'classic_games', avatar: 'CG', email: 'Classic Game Lover', followers: 765, following: 298, isFollowing: false }
+};
+
 let isLoading = false;
 let loadedGames = 0;
 let isSearchMode = false;
 let isFocusMode = false;
 let currentPage = 'home';
-let savedGames = []; // Array to store saved games
-let currentPlayingGame = null; // Track current game for saving
+let savedGames = [];
+let currentPlayingGame = null;
+let touchStartX = 0;
+let touchStartY = 0;
+let selectedCategories = new Set(['arcade', 'puzzle', 'action', 'strategy', 'casual']);
+let createdGames = [];
 
-// Dummy user data
-const userData = {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    followers: 1200,
-    following: 856,
-    gamesPlayed: 24
-};
-
-let containerWidth = Math.min(window.innerWidth, window.innerHeight * .5);
-let containerHeight = containerWidth * 18.5 / 9;
-
+// DOM elements
 const gamesContainer = document.getElementById('gamesContainer');
 const searchBar = document.getElementById('searchBar');
 const searchResults = document.getElementById('searchResults');
 const searchGrid = document.getElementById('searchGrid');
-const backButton = document.getElementById('backButton');
 const noResults = document.getElementById('noResults');
-const exitFocusButton = document.getElementById('exitFocusButton');
 const container = document.querySelector('.container');
-
-// Profile elements
+const headerContainer = document.getElementById('headerContainer');
 const profileButton = document.getElementById('profileButton');
 const dropdownMenu = document.getElementById('dropdownMenu');
-const profilePage = document.getElementById('profilePage');
-const savedGamesPage = document.getElementById('savedGamesPage');
-const profileBackButton = document.getElementById('profileBackButton');
-const savedBackButton = document.getElementById('savedBackButton');
-const savedGamesGrid = document.getElementById('savedGamesGrid');
-const savedCount = document.getElementById('savedCount');
-const noSavedGames = document.getElementById('noSavedGames');
-const savedSearchBar = document.getElementById('savedSearchBar');
-const headerContainer = document.getElementById('headerContainer');
+const filterButton = document.getElementById('filterButton');
+const filterModal = document.getElementById('filterModal');
+const swipeLeftIndicator = document.getElementById('swipeLeftIndicator');
+const swipeRightIndicator = document.getElementById('swipeRightIndicator');
 
-// Game icons for search preview (simple emojis)
 const gameIcons = {
-    'Breakout Classic': 'BC',
-    'Tetris': 'T',
-    'Snake Game': 'SG',
-    'Pac-Man': 'PM',
-    'Space Invaders': 'SI',
-    'Frogger': 'F',
-    'Asteroids': 'A',
-    'Centipede': 'C',
-    'Pong': 'P',
-    'Missile Command': 'MC'
+    'Breakout Classic': 'BC', 'Tetris': 'T', 'Snake Game': 'SG', 'Pac-Man': 'PM', 'Space Invaders': 'SI',
+    'Frogger': 'F', 'Asteroids': 'A', 'Centipede': 'C', 'Pong': 'P', 'Missile Command': 'MC'
 };
 
-// Create a game element with title and creator outside iframe
-function createGameElement(gameData, index) {
-    let width = parseFloat(gameData.width);
-    let height = parseFloat(gameData.height);
-    let scale = Math.min(containerWidth / width, containerHeight / height);
-
-    const gameDiv = document.createElement('div');
-    gameDiv.className = 'game';
-    gameDiv.innerHTML = `
-        <iframe class="playableGames" 
-                src="${gameData.src}" 
-                style="width:${width}px;height:${height}px;scale:${scale};transform:translate(-${(1-scale) * 50 / scale}%,-${(1-scale) * 50 / scale}%);">
-        </iframe>
-        <div class="game-info">
-            <div class="game-info-content">
-                <div class="game-details">
-                    <div class="game-title">${gameData.title}</div>
-                    <div class="game-creator">by ${gameData.creator}</div>
-                </div>
-                <button class="focus-button" onclick="toggleFocusMode()" title="Focus Mode">Focus</button>
-            </div>
-        </div>
-    `;
-    return gameDiv;
-}
-
-// Create search result item
-function createSearchItem(gameData, index) {
-    const searchItem = document.createElement('div');
-    searchItem.className = 'search-item';
-    searchItem.innerHTML = `
-        <div class="search-item-preview">${gameIcons[gameData.title] || '🎮'}</div>
-        <div class="search-item-title">${gameData.title}</div>
-        <div class="search-item-creator">by ${gameData.creator}</div>
-    `;
-    
-    searchItem.addEventListener('click', () => {
-        selectGame(index);
-    });
-    
-    return searchItem;
-}
-
-// Select a game and return to scroll view
-function selectGame(gameIndex, enterFocus = false) {
-    hideSearchResults();
-    showPage('home');
-    
-    // Clear current games and load selected game
-    gamesContainer.innerHTML = '';
-    currentGameIndex = gameIndex;
-    loadedGames = 0;
-    
-    // Load selected game and a few more
-    for (let i = 0; i < Math.min(3, gameSources.length); i++) {
-        const gameData = gameSources[(gameIndex + i) % gameSources.length];
-        const gameElement = createGameElement(gameData, (gameIndex + i) % gameSources.length);
-        gamesContainer.appendChild(gameElement);
-        loadedGames++;
-    }
-    
-    currentGameIndex = (gameIndex + Math.min(3, gameSources.length)) % gameSources.length;
-    
-    // Scroll to top to show selected game
-    gamesContainer.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    // Enter focus mode if requested
-    if (enterFocus && !isFocusMode) {
-        setTimeout(() => toggleFocusMode(), 500);
-    }
-}
-
-// Show search results
-function showSearchResults(results) {
-    isSearchMode = true;
-    gamesContainer.style.display = 'none';
-    searchResults.style.display = 'block';
-    searchGrid.innerHTML = '';
-    
-    if (results.length === 0) {
-        noResults.style.display = 'block';
-        return;
-    }
-    
-    noResults.style.display = 'none';
-    
-    results.forEach((game, index) => {
-        const originalIndex = gameSources.findIndex(g => g.title === game.title);
-        const searchItem = createSearchItem(game, originalIndex);
-        searchGrid.appendChild(searchItem);
-    });
-}
-
-// Hide search results
-function hideSearchResults() {
-    isSearchMode = false;
-    searchResults.style.display = 'none';
-    gamesContainer.style.display = 'flex';
-    searchBar.value = '';
-}
-
-// Toggle focus mode
-function toggleFocusMode() {
-    isFocusMode = !isFocusMode;
-    if (isFocusMode) {
-        container.classList.add('focus-mode');
-        gamesContainer.style.scrollBehavior = 'auto';
-        gamesContainer.scrollTop = Math.floor(gamesContainer.scrollTop / gamesContainer.clientHeight) * gamesContainer.clientHeight;
-        headerContainer.style.display = 'none';
-        document.querySelector('.footer_container').style.display = 'none';
-    } else {
-        container.classList.remove('focus-mode');
-        headerContainer.style.display = 'flex';
-        document.querySelector('.footer_container').style.display = 'flex';
-    }
-}
-
-// Page navigation
-function showPage(pageName) {
-    // Hide all pages
-    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-    gamesContainer.style.display = 'none';
-    searchResults.style.display = 'none';
-    
-    currentPage = pageName;
-    
-    // Show/hide header and footer based on page
-    if (pageName === 'profile' || pageName === 'savedGames') {
-        headerContainer.style.display = 'none';
-        document.querySelector('.footer_container').style.display = 'none';
-    } else {
-        headerContainer.style.display = 'flex';
-        document.querySelector('.footer_container').style.display = 'flex';
-    }
-    
-    if (pageName === 'home') {
-        gamesContainer.style.display = 'flex';
-        if (isSearchMode) {
-            searchResults.style.display = 'block';
-            gamesContainer.style.display = 'none';
-        }
-    } else {
-        const page = document.getElementById(pageName + 'Page');
-        if (page) page.classList.add('active');
-        
-        if (pageName === 'savedGames') {
-            updateSavedGamesDisplay();
-        }
-    }
-    
-    hideDropdown();
-}
-
-function hideDropdown() {
-    dropdownMenu.classList.remove('active');
-}
-
-// Save game functionality
-function saveGame(gameData) {
-    const existingIndex = savedGames.findIndex(game => game.title === gameData.title);
-    if (existingIndex === -1) {
-        savedGames.push({...gameData, savedAt: new Date().toISOString()});
-        updateSavedCount();
-        return true; // Game saved
-    }
-    return false; // Game already saved
-}
-
-function unsaveGame(gameTitle) {
-    savedGames = savedGames.filter(game => game.title !== gameTitle);
-    updateSavedCount();
-    updateSavedGamesDisplay();
-}
-
-function updateSavedCount() {
-    savedCount.textContent = savedGames.length;
-}
-
-function updateSavedGamesDisplay(filteredGames = null) {
-    savedGamesGrid.innerHTML = '';
-    
-    const gamesToShow = filteredGames || savedGames;
-    
-    if (gamesToShow.length === 0) {
-        noSavedGames.style.display = 'block';
-        noSavedGames.textContent = filteredGames ? 'No saved games match your search.' : 'No saved games yet. Save some games to see them here!';
-        return;
-    }
-    
-    noSavedGames.style.display = 'none';
-    
-    gamesToShow.forEach(game => {
-        const savedItem = document.createElement('div');
-        savedItem.className = 'saved-game-item';
-        savedItem.innerHTML = `
-            <button class="unsave-btn" onclick="unsaveGame('${game.title}')">×</button>
-            <div class="search-item-preview">${gameIcons[game.title] || '🎮'}</div>
-            <div class="search-item-title">${game.title}</div>
-            <div class="search-item-creator">by ${game.creator}</div>
-        `;
-        
-        savedItem.addEventListener('click', (e) => {
-            if (!e.target.classList.contains('unsave-btn')) {
-                const originalIndex = gameSources.findIndex(g => g.title === game.title);
-                selectGame(originalIndex, true); // Enter focus mode automatically
-            }
-        });
-        
-        savedGamesGrid.appendChild(savedItem);
-    });
-}
-
-// Update current playing game for save functionality
-function updateCurrentGame() {
-    const scrollTop = gamesContainer.scrollTop;
-    const gameHeight = gamesContainer.clientHeight;
-    const currentIndex = Math.round(scrollTop / gameHeight);
-    
-    // Make sure we get the right game from the current loaded games
-    const gameElements = gamesContainer.querySelectorAll('.game');
-    if (gameElements.length > 0 && currentIndex < gameElements.length) {
-        // Get the game title from the currently visible game element
-        const currentGameElement = gameElements[currentIndex];
-        const gameTitle = currentGameElement.querySelector('.game-title')?.textContent;
-        
-        if (gameTitle) {
-            currentPlayingGame = gameSources.find(game => game.title === gameTitle);
-        }
-    }
-}
-
-// Shuffle array function
 function shuffleArray(array) {
-    const shuffled = [...array]; // Create a copy
+    const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
@@ -369,228 +156,447 @@ function shuffleArray(array) {
     return shuffled;
 }
 
-// Load initial games with randomized order
+function formatNumber(num) {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num.toString();
+}
+
+// Updated createGameElement with repositioned buttons
+function createGameElement(gameData, index) {
+    const gameDiv = document.createElement('div');
+    gameDiv.className = 'game';
+    gameDiv.innerHTML = `
+        <iframe src="${gameData.src}" style="width:100%;height:100%;" loading="lazy"></iframe>
+        <div class="game-overlay">
+            <div class="game-info">
+                <div class="creator-profile" onclick="showCreatorProfile('${gameData.creator}')">
+                    ${creators[gameData.creator]?.avatar || gameData.creator.substring(0, 2).toUpperCase()}
+                </div>
+                <div class="game-details">
+                    <div class="game-title">${gameData.title}</div>
+                    <div class="game-creator">@${gameData.creator}</div>
+                </div>
+                <div class="action-buttons">
+                    <button class="focus-entry-btn" onclick="toggleFocusMode()">Focus</button>
+                    <button class="action-btn" onclick="saveGame('${gameData.title}')" id="save-${gameData.title}">Save</button>
+                </div>
+            </div>
+        </div>
+    `;
+    return gameDiv;
+}
+
+function createSearchItem(gameData) {
+    const searchItem = document.createElement('div');
+    searchItem.className = 'search-item';
+    searchItem.innerHTML = `
+        <div class="search-item-preview">${gameIcons[gameData.title] || 'G'}</div>
+        <div class="search-item-title">${gameData.title}</div>
+        <div class="search-item-creator">@${gameData.creator}</div>
+    `;
+    searchItem.addEventListener('click', () => {
+        selectGame(gameData, true);
+    });
+    return searchItem;
+}
+
 function loadInitialGames() {
     gamesContainer.innerHTML = '';
-    currentGameIndex = 0;
     loadedGames = 0;
     
-    // Shuffle the games array
-    const shuffledGames = shuffleArray(gameSources);
+    const filteredGames = MASTER_GAME_SOURCES.filter(game => 
+        game.categories.some(category => selectedCategories.has(category))
+    );
     
-    // Load first 3 games from shuffled array
-    for (let i = 0; i < Math.min(3, shuffledGames.length); i++) {
-        const gameElement = createGameElement(shuffledGames[i], i);
-        gamesContainer.appendChild(gameElement);
-        loadedGames++;
-    }
-    currentGameIndex = Math.min(3, shuffledGames.length);
-    
-    // Update the gameSources to use shuffled order for this session
+    const shuffledGames = shuffleArray(filteredGames);
     gameSources.length = 0;
     gameSources.push(...shuffledGames);
     
-    // Set initial current game
+    for (let i = 0; i < Math.min(3, gameSources.length); i++) {
+        const gameElement = createGameElement(gameSources[i], i);
+        gamesContainer.appendChild(gameElement);
+        loadedGames++;
+    }
     updateCurrentGame();
 }
 
-// Load more games
-function loadMoreGames() {
-    if (isLoading || isSearchMode || isFocusMode) return;
-    
-    isLoading = true;
-
-    setTimeout(() => {
-        const gamesToLoad = Math.min(2, gameSources.length - currentGameIndex);
-        
-        for (let i = 0; i < gamesToLoad; i++) {
-            const gameData = gameSources[(currentGameIndex + i) % gameSources.length];
-            const gameElement = createGameElement(gameData, (currentGameIndex + i) % gameSources.length);
-            gamesContainer.appendChild(gameElement);
-            loadedGames++;
-        }
-        
-        currentGameIndex = (currentGameIndex + gamesToLoad) % gameSources.length;
-        isLoading = false;
-    }, 500);
+function updateActionButtonStates(gameTitle) {
+    const saveBtns = document.querySelectorAll(`[id="save-${gameTitle}"]`);
+    const isSaved = savedGames.some(game => game.title === gameTitle);
+    saveBtns.forEach(btn => btn.classList.toggle('saved', isSaved));
 }
 
-// Search functionality
 function performSearch(searchTerm) {
     if (searchTerm.trim() === '') {
         hideSearchResults();
         return;
     }
-
-    const results = gameSources.filter(game => 
-        game.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        game.creator.toLowerCase().includes(searchTerm.toLowerCase())
-    ).sort((a, b) => {
-        const aStartsWith = a.title.toLowerCase().startsWith(searchTerm.toLowerCase());
-        const bStartsWith = b.title.toLowerCase().startsWith(searchTerm.toLowerCase());
-        
-        if (aStartsWith && !bStartsWith) return -1;
-        if (!aStartsWith && bStartsWith) return 1;
-        
-        const aIndex = a.title.toLowerCase().indexOf(searchTerm.toLowerCase());
-        const bIndex = b.title.toLowerCase().indexOf(searchTerm.toLowerCase());
-        
-        if (aIndex !== bIndex) return aIndex - bIndex;
-        
-        return a.title.localeCompare(b.title);
-    });
-
+    const results = MASTER_GAME_SOURCES.filter(game => 
+        (game.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        game.creator.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        game.categories.some(category => selectedCategories.has(category))
+    );
     showSearchResults(results);
 }
 
-// Event Listeners
-searchBar.addEventListener('input', function() {
-    const searchTerm = this.value.trim();
-    performSearch(searchTerm);
-});
+function loadMoreGames() {
+    if (isLoading || isSearchMode || isFocusMode || gameSources.length === 0) return;
+    
+    isLoading = true;
+    setTimeout(() => {
+        const gamesToLoad = 2;
+        for (let i = 0; i < gamesToLoad; i++) {
+            const gameIndex = loadedGames % gameSources.length;
+            const gameData = gameSources[gameIndex];
+            const gameElement = createGameElement(gameData, gameIndex);
+            gamesContainer.appendChild(gameElement);
+            updateActionButtonStates(gameData.title);
+            loadedGames++;
+        }
+        isLoading = false;
+    }, 300);
+}
 
-backButton.addEventListener('click', hideSearchResults);
+function updateCurrentGame() {
+    const scrollTop = gamesContainer.scrollTop;
+    const gameHeight = window.innerHeight;
+    const currentIndex = Math.round(scrollTop / gameHeight);
+    
+    const gameElements = gamesContainer.querySelectorAll('.game');
+    if (gameElements.length > 0 && currentIndex < gameElements.length) {
+        const gameTitle = gameElements[currentIndex].querySelector('.game-title')?.textContent;
+        if (gameTitle) {
+            currentPlayingGame = MASTER_GAME_SOURCES.find(game => game.title === gameTitle);
+            updateActionButtonStates(gameTitle);
+        }
+    }
+}
 
-exitFocusButton.addEventListener('click', toggleFocusMode);
+function selectGame(selectedGame, enterFocus = false) {
+    if (!selectedGame) return;
 
-// Profile menu functionality
-profileButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    dropdownMenu.classList.toggle('active');
-});
+    hideSearchResults();
+    showPage('home');
 
-document.addEventListener('click', () => {
+    let gameIndex = gameSources.findIndex(g => g.title === selectedGame.title);
+
+    if (gameIndex === -1) {
+        gameSources.unshift(selectedGame);
+        gameIndex = 0;
+    }
+
+    const [gameToMove] = gameSources.splice(gameIndex, 1);
+    gameSources.unshift(gameToMove);
+
+    gamesContainer.innerHTML = '';
+    loadedGames = 0;
+
+    for (let i = 0; i < Math.min(3, gameSources.length); i++) {
+        const gameElement = createGameElement(gameSources[i], i);
+        gamesContainer.appendChild(gameElement);
+        loadedGames++;
+    }
+    
+    gamesContainer.scrollTo({ top: 0, behavior: 'auto' });
+    updateCurrentGame();
+    
+    if (enterFocus && !isFocusMode) {
+        setTimeout(() => toggleFocusMode(), 500);
+    }
+}
+
+function showSearchResults(results) {
+    isSearchMode = true;
+    gamesContainer.style.display = 'none';
+    searchResults.style.display = 'block';
+    searchGrid.innerHTML = '';
+    noResults.style.display = results.length === 0 ? 'block' : 'none';
+    
+    results.forEach(game => {
+        const searchItem = createSearchItem(game);
+        searchGrid.appendChild(searchItem);
+    });
+}
+
+function hideSearchResults() {
+    isSearchMode = false;
+    searchResults.style.display = 'none';
+    gamesContainer.style.display = 'block';
+    searchBar.value = '';
+}
+
+function showPage(pageName) {
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    gamesContainer.style.display = 'none';
+    searchResults.style.display = 'none';
+    currentPage = pageName;
+    
+    if (pageName === 'home') {
+        gamesContainer.style.display = 'block';
+        headerContainer.style.display = 'flex';
+        if (isSearchMode) {
+            searchResults.style.display = 'block';
+            gamesContainer.style.display = 'none';
+        }
+    } else {
+        headerContainer.style.display = 'none';
+        const page = document.getElementById(pageName + 'Page');
+        if (page) page.classList.add('active');
+        
+        if (pageName === 'savedGames') updateSavedGamesDisplay();
+        else if (pageName === 'profile') updateProfileStats();
+    }
     hideDropdown();
-});
+    hideFilterModal();
+}
 
-// Dropdown menu items
+function toggleFocusMode() {
+    isFocusMode = !isFocusMode;
+    container.classList.toggle('focus-mode', isFocusMode);
+    
+    if (isFocusMode) {
+        headerContainer.style.display = 'none';
+        const scrollTop = gamesContainer.scrollTop;
+        const gameHeight = window.innerHeight;
+        const currentIndex = Math.round(scrollTop / gameHeight);
+        gamesContainer.scrollTo({ top: currentIndex * gameHeight, behavior: 'smooth' });
+    } else if (currentPage === 'home') {
+        headerContainer.style.display = 'flex';
+    }
+}
+
+function saveGame(gameTitle) {
+    const game = MASTER_GAME_SOURCES.find(g => g.title === gameTitle);
+    if (!game) return;
+    
+    const existingIndex = savedGames.findIndex(g => g.title === gameTitle);
+    if (existingIndex === -1) {
+        savedGames.push({...game, savedAt: new Date().toISOString()});
+    } else {
+        savedGames.splice(existingIndex, 1);
+    }
+    updateActionButtonStates(gameTitle);
+    updateSavedCount();
+}
+
+function shareGame(gameTitle) {
+    if (navigator.share) {
+        navigator.share({ title: gameTitle, text: `Check out this game: ${gameTitle}`, url: window.location.href })
+            .catch(err => console.log("Share failed:", err));
+    } else {
+        navigator.clipboard?.writeText(`Check out this game: ${gameTitle} - ${window.location.href}`);
+        alert('Link copied to clipboard!');
+    }
+}
+
+function showCreatorProfile(creatorName) {
+    const creator = creators[creatorName];
+    if (!creator) return;
+    
+    document.getElementById('creatorAvatar').textContent = creator.avatar;
+    document.getElementById('creatorName').textContent = creator.name;
+    document.getElementById('creatorEmail').textContent = creator.email;
+    document.getElementById('creatorFollowers').textContent = formatNumber(creator.followers);
+    document.getElementById('creatorFollowing').textContent = formatNumber(creator.following);
+    
+    const creatorGames = MASTER_GAME_SOURCES.filter(game => game.creator === creatorName);
+    document.getElementById('creatorGamesCount').textContent = creatorGames.length;
+    
+    const followBtn = document.getElementById('followCreatorBtn');
+    followBtn.textContent = creator.isFollowing ? 'Following' : 'Follow';
+    followBtn.className = `follow-btn ${creator.isFollowing ? 'following' : ''}`;
+    followBtn.onclick = () => toggleFollowCreator(creatorName);
+    
+    const gamesGrid = document.getElementById('creatorGamesGrid');
+    gamesGrid.innerHTML = '';
+    creatorGames.forEach(game => {
+        const gameThumb = document.createElement('div');
+        gameThumb.className = 'game-thumbnail';
+        gameThumb.textContent = gameIcons[game.title] || 'G';
+        gameThumb.title = game.title;
+        gameThumb.onclick = () => selectGame(game, true);
+        gamesGrid.appendChild(gameThumb);
+    });
+    
+    showPage('creatorProfile');
+}
+
+function toggleFollowCreator(creatorName) {
+    const creator = creators[creatorName];
+    if (!creator) return;
+    creator.isFollowing = !creator.isFollowing;
+    creator.followers += creator.isFollowing ? 1 : -1;
+    
+    const followBtn = document.getElementById('followCreatorBtn');
+    followBtn.textContent = creator.isFollowing ? 'Following' : 'Follow';
+    followBtn.className = `follow-btn ${creator.isFollowing ? 'following' : ''}`;
+    document.getElementById('creatorFollowers').textContent = formatNumber(creator.followers);
+}
+
+function showFilterModal() {
+    filterModal.classList.add('active');
+    updateCategoriesList();
+}
+
+function hideFilterModal() {
+    filterModal.classList.remove('active');
+}
+
+function updateCategoriesList() {
+    const categoriesList = document.getElementById('categoriesList');
+    categoriesList.innerHTML = '';
+    categories.forEach(category => {
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = 'category-item';
+        categoryDiv.innerHTML = `
+            <input type="checkbox" class="category-checkbox" id="cat-${category.id}" ${selectedCategories.has(category.id) ? 'checked' : ''}>
+            <label for="cat-${category.id}">${category.name}</label>`;
+        
+        const checkbox = categoryDiv.querySelector('input');
+        checkbox.addEventListener('change', () => {
+            checkbox.checked ? selectedCategories.add(category.id) : selectedCategories.delete(category.id);
+            if (currentPage === 'home' && !isSearchMode) {
+                loadInitialGames();
+            }
+        });
+        categoriesList.appendChild(categoryDiv);
+    });
+}
+
+function updateSavedGamesDisplay() {
+    const savedGamesGrid = document.getElementById('savedGamesGrid');
+    const noSavedGames = document.getElementById('noSavedGames');
+    savedGamesGrid.innerHTML = '';
+    noSavedGames.style.display = savedGames.length === 0 ? 'block' : 'none';
+    
+    savedGames.forEach(game => {
+        const gameThumb = document.createElement('div');
+        gameThumb.className = 'game-thumbnail';
+        gameThumb.textContent = gameIcons[game.title] || 'G';
+        gameThumb.title = game.title;
+        gameThumb.onclick = () => selectGame(game, true);
+        savedGamesGrid.appendChild(gameThumb);
+    });
+}
+
+function updateSavedCount() {
+    document.getElementById('savedCount').textContent = savedGames.length;
+}
+
+function updateProfileStats() {
+    document.getElementById('createdGamesCount').textContent = createdGames.length;
+    updateSavedCount();
+}
+
+function showUploadModal() { document.getElementById('uploadModal').classList.add('active'); }
+function hideUploadModal() { document.getElementById('uploadModal').classList.remove('active'); }
+
+function handleGameUpload(formData) {
+    const selectedCats = Array.from(formData.getAll('categories'));
+    if (selectedCats.length === 0) return alert('Please select at least one category');
+    
+    const gameData = {
+        title: formData.get('title'), creator: 'jafar', categories: selectedCats,
+        description: formData.get('description'), src: `games/user_${Date.now()}/index.html`,
+        width: "500", height: "800", createdAt: new Date().toISOString()
+    };
+    
+    createdGames.push(gameData);
+    MASTER_GAME_SOURCES.unshift(gameData);
+    alert(`Game "${gameData.title}" uploaded successfully!`);
+    hideUploadModal();
+    updateProfileStats();
+    loadInitialGames();
+}
+
+function hideDropdown() { dropdownMenu.classList.remove('active'); }
+
+function handleTouchStart(e) {
+    if (currentPage !== 'home') return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    if (touchStartX < 20) swipeLeftIndicator.style.opacity = '1';
+    if (touchStartX > window.innerWidth - 20) swipeRightIndicator.style.opacity = '1';
+}
+
+function handleTouchMove(e) {
+    if (currentPage !== 'home') return;
+    const touchCurrentX = e.touches[0].clientX;
+    const diffX = touchCurrentX - touchStartX;
+    if (touchStartX < 20 && diffX > 0) swipeLeftIndicator.style.opacity = Math.min(diffX / 100, 1);
+    if (touchStartX > window.innerWidth - 20 && diffX < 0) swipeRightIndicator.style.opacity = Math.min(Math.abs(diffX) / 100, 1);
+}
+
+function handleTouchEnd(e) {
+    if (currentPage !== 'home') return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diffX = touchEndX - touchStartX;
+    swipeLeftIndicator.style.opacity = '0';
+    swipeRightIndicator.style.opacity = '0';
+    if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(e.changedTouches[0].clientY - touchStartY)) {
+        if (touchStartX < 20 && diffX > 100 && !isFocusMode) toggleFocusMode();
+        if (touchStartX > window.innerWidth - 20 && diffX < -100 && isFocusMode) toggleFocusMode();
+    }
+}
+
+// Event listeners
+searchBar.addEventListener('input', function() { performSearch(this.value.trim()); });
+filterButton.addEventListener('click', showFilterModal);
+document.getElementById('closeFilterBtn').addEventListener('click', hideFilterModal);
+profileButton.addEventListener('click', (e) => { e.stopPropagation(); dropdownMenu.classList.toggle('active'); });
+document.addEventListener('click', hideDropdown);
+
 document.getElementById('profileMenuItem').addEventListener('click', () => showPage('profile'));
 document.getElementById('savedGamesMenuItem').addEventListener('click', () => showPage('savedGames'));
 document.getElementById('homeMenuItem').addEventListener('click', () => showPage('home'));
+document.getElementById('profileBackButton').addEventListener('click', () => showPage('home'));
+document.getElementById('savedBackButton').addEventListener('click', () => showPage('profile'));
+document.getElementById('creatorBackButton').addEventListener('click', () => showPage('home'));
+document.getElementById('uploadGameBtn').addEventListener('click', showUploadModal);
+document.getElementById('uploadBackButton').addEventListener('click', hideUploadModal);
+document.getElementById('gameUploadForm').addEventListener('submit', (e) => { e.preventDefault(); handleGameUpload(new FormData(e.target)); });
+document.getElementById('focusExitBtn').addEventListener('click', toggleFocusMode);
 
-// Back buttons
-profileBackButton.addEventListener('click', () => showPage('home'));
-savedBackButton.addEventListener('click', () => showPage('home'));
+document.addEventListener('touchstart', handleTouchStart, { passive: true });
+document.addEventListener('touchmove', handleTouchMove, { passive: true });
+document.addEventListener('touchend', handleTouchEnd, { passive: true });
 
-// Saved games search functionality
-savedSearchBar.addEventListener('input', function() {
-    const searchTerm = this.value.trim().toLowerCase();
-    
-    if (searchTerm === '') {
-        updateSavedGamesDisplay();
-        return;
-    }
-    
-    const filteredGames = savedGames.filter(game => 
-        game.title.toLowerCase().includes(searchTerm) ||
-        game.creator.toLowerCase().includes(searchTerm)
-    ).sort((a, b) => {
-        const aStartsWith = a.title.toLowerCase().startsWith(searchTerm);
-        const bStartsWith = b.title.toLowerCase().startsWith(searchTerm);
-        
-        if (aStartsWith && !bStartsWith) return -1;
-        if (!aStartsWith && bStartsWith) return 1;
-        
-        return a.title.localeCompare(b.title);
-    });
-    
-    updateSavedGamesDisplay(filteredGames);
-});
-
-// Handle scroll events
 gamesContainer.addEventListener('scroll', () => {
-    if (isSearchMode || isFocusMode) return;
-    
-    const scrollTop = gamesContainer.scrollTop;
-    const scrollHeight = gamesContainer.scrollHeight;
-    const clientHeight = gamesContainer.clientHeight;
-    
-    // Update current game for save functionality
+    if (isSearchMode) return;
     updateCurrentGame();
-    
-    // Load more games when near bottom
-    if (scrollTop + clientHeight >= scrollHeight - 1000) {
+    if (isFocusMode) return;
+    if (gamesContainer.scrollTop + gamesContainer.clientHeight >= gamesContainer.scrollHeight - 500) {
         loadMoreGames();
     }
 });
 
-// Handle keyboard navigation
 document.addEventListener('keydown', (e) => {
-    if (isSearchMode || isFocusMode) {
-        if (e.key === 'Escape') {
-            if (isSearchMode) hideSearchResults();
-            if (isFocusMode) toggleFocusMode();
-        }
-        return;
+    const isTyping = document.activeElement.tagName === 'INPUT';
+    if (currentPage !== 'home' || isTyping) return;
+    
+    if (e.key === 'Escape') {
+        if (isSearchMode) hideSearchResults();
+        else if (isFocusMode) toggleFocusMode();
     }
     
-    if (e.key === 'ArrowDown' || e.key === ' ') {
-        e.preventDefault();
-        const currentScroll = gamesContainer.scrollTop;
-        const nextGame = Math.floor(currentScroll / gamesContainer.clientHeight) + 1;
-        gamesContainer.scrollTo({
-            top: nextGame * gamesContainer.clientHeight,
-            behavior: 'smooth'
-        });
-    } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        const currentScroll = gamesContainer.scrollTop;
-        const prevGame = Math.floor(currentScroll / gamesContainer.clientHeight) - 1;
-        if (prevGame >= 0) {
-            gamesContainer.scrollTo({
-                top: prevGame * gamesContainer.clientHeight,
-                behavior: 'smooth'
-            });
-        }
-    } else if (e.key === 'Escape') {
-        hideSearchResults();
-    }
-});
-
-// Button event listeners (you can customize these)
-document.getElementById('likeButton').addEventListener('click', () => {
-    console.log('Liked!');
-    // Add like functionality
-});
-
-document.getElementById('shareButton').addEventListener('click', () => {
-    console.log('Shared!');
-    // Add share functionality
-});
-
-document.getElementById('followButton').addEventListener('click', () => {
-    console.log('Followed!');
-    // Add follow functionality
-});
-
-document.getElementById('saveButton').addEventListener('click', () => {
-    if (currentPlayingGame) {
-        const saved = saveGame(currentPlayingGame);
-        if (saved) {
-            // Visual feedback
-            const saveBtn = document.getElementById('saveButton');
-            const originalText = saveBtn.textContent;
-            saveBtn.textContent = 'Saved!';
-            saveBtn.style.background = '#4CAF50';
-            setTimeout(() => {
-                saveBtn.textContent = originalText;
-                saveBtn.style.background = '';
-            }, 1500);
-        } else {
-            // Game already saved
-            const saveBtn = document.getElementById('saveButton');
-            const originalText = saveBtn.textContent;
-            saveBtn.textContent = 'Already Saved';
-            setTimeout(() => {
-                saveBtn.textContent = originalText;
-            }, 1500);
+    if (!isSearchMode && !isFocusMode) {
+        const gameHeight = window.innerHeight;
+        if (e.key === 'ArrowDown' || e.key === ' ') {
+            e.preventDefault();
+            gamesContainer.scrollTo({ top: gamesContainer.scrollTop + gameHeight, behavior: 'smooth' });
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            gamesContainer.scrollTo({ top: gamesContainer.scrollTop - gameHeight, behavior: 'smooth' });
         }
     }
 });
 
-// Initialize the app
-loadInitialGames();
-
-// Make functions global for HTML onclick
-window.unsaveGame = unsaveGame;
+window.saveGame = saveGame;
+window.shareGame = shareGame;
+window.showCreatorProfile = showCreatorProfile;
+window.toggleFollowCreator = toggleFollowCreator;
 window.toggleFocusMode = toggleFocusMode;
+
+loadInitialGames();
+updateSavedCount();
