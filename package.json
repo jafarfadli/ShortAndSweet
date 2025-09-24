@@ -1,0 +1,41 @@
+{
+  "name": "shortandsweet",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --mac"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jafarfadli/ShortAndSweet.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/jafarfadli/ShortAndSweet/issues"
+  },
+  "homepage": "https://github.com/jafarfadli/ShortAndSweet#readme",
+  "devDependencies": {
+    "electron": "^38.1.2",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.example.myapp",
+    "productName": "Short n Sweet test App",
+    "files": [
+      "**/*"
+    ],
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    }
+  },
+  "dependencies": {
+  }
+}
