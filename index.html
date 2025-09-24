@@ -1,142 +1,183 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Final Scrollable iFrames</title>
-    <style>
-        /* --- English Comments --- */
-
-        /* CSS Reset: Removes default browser styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            /* IMPORTANT: Prevents the default browser scrollbar */
-            overflow: hidden; 
-            font-family: sans-serif;
-        }
-
-        /* The main container that will be moved up and down */
-        #container {
-            width: 100%;
-            height: 100%;
-            /* This transition creates the smooth scrolling animation */
-            transition: transform 0.6s ease-in-out;
-        }
-
-        /* Each section is a full-screen wrapper for an iframe */
-        .section {
-            width: 100vw; /* 100% of the viewport width */
-            height: 100vh; /* 100% of the viewport height */
-            position: relative; /* Needed for positioning the overlay and iframe inside */
-            overflow: hidden;
-        }
-
-        /* The actual iframe holding the game */
-        .game-iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-            z-index: 1; /* Sits below the overlay */
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Shorts And Sweet</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <div id="container">
-        <div class="section">
-            <iframe class="game-iframe" src="https://funhtml5games.com?embed=doodlejump" loading="lazy"></iframe>
+    <div class="container">
+        <div class="header_container" id="headerContainer">
+            <div class="search-container">
+                <input type="text" class="input_text" id="searchBar" placeholder="Search games...">
+                <button class="filter-button" id="filterButton">⚙️</button>
+            </div>
+            <button class="profileButton" id="profileButton">JF</button>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <div class="dropdown-item" id="profileMenuItem">Profile</div>
+                <div class="dropdown-item" id="savedGamesMenuItem">Saved Games</div>
+                <div class="dropdown-item" id="homeMenuItem">Home</div>
+            </div>
         </div>
-        <div class="section">
-            <iframe class="game-iframe" src="https://funhtml5games.com?embed=cuttherope" loading="lazy"></iframe>
+
+        <div class="games_container" id="gamesContainer">
         </div>
-        <div class="section">
-            <iframe class="game-iframe" src="https://funhtml5games.com?embed=pacman" loading="lazy"></iframe>
+
+        <div class="filter-modal" id="filterModal">
+            <div class="filter-header">
+                <div class="filter-title">Filter Games</div>
+                <button class="close-btn" id="closeFilterBtn">×</button>
+            </div>
+            <div class="categories-list" id="categoriesList">
+            </div>
         </div>
-        <div class="section">
-            <iframe class="game-iframe" src="https://funhtml5games.com?embed=tetris" loading="lazy"></iframe>
+
+        <div class="search-results" id="searchResults">
+            <div class="search-grid" id="searchGrid">
+            </div>
+            <div class="no-results" id="noResults" style="display: none;">
+                No games found matching your search.
+            </div>
         </div>
-        <div class="section">
-            <iframe class="game-iframe" src="https://funhtml5games.com?embed=flappybird" loading="lazy"></iframe>
-        </div>
-    </div>
 
-    <script>
-        // --- English Comments ---
-
-        const container = document.getElementById('container');
-        const sections = document.querySelectorAll('.section');
-        const totalSections = sections.length;
-
-        let currentIndex = 0; // Tracks the currently visible section
-        let isScrolling = false; // Flag to prevent multiple scrolls during animation
-        let touchStartY = 0; // Stores the starting Y position of a touch
-
-        // --- Main scroll function ---
-        const scrollToSection = (index) => {
-            if (index >= 0 && index < totalSections) {
-                isScrolling = true;
-                currentIndex = index;
-                container.style.transform = `translateY(-${currentIndex * 100}vh)`;
-
-                // Wait for the animation to finish before allowing another scroll
-                setTimeout(() => {
-                    isScrolling = false;
-                }, 800); // A bit longer than the CSS transition to be safe
-            }
-        };
-
-        // --- Mouse Wheel Event Handler ---
-        const handleWheel = (e) => {
-            if (isScrolling) return;
-
-            // e.deltaY > 0 means scrolling down
-            if (e.deltaY > 0) {
-                scrollToSection(currentIndex + 1);
-            } 
-            // e.deltaY < 0 means scrolling up
-            else if (e.deltaY < 0) {
-                scrollToSection(currentIndex - 1);
-            }
-        };
-
-        // --- Touch Event Handlers for Mobile ---
-        const handleTouchStart = (e) => {
-            if (isScrolling) return;
-            touchStartY = e.touches[0].clientY;
-        };
-
-        const handleTouchMove = (e) => {
-            if (isScrolling) return;
+        <div class="page" id="profilePage">
+            <div class="page-header">
+                <button class="back-button" id="profileBackButton">←</button>
+                <div class="page-title">Profile</div>
+            </div>
             
-            const touchCurrentY = e.touches[0].clientY;
-            const deltaY = touchStartY - touchCurrentY;
-            const sensitivity = 50; // Minimum swipe distance
+            <div class="profile-info">
+                <div class="profile-avatar-large">JF</div>
+                <div class="profile-name">Jafar Fadli</div>
+                <div class="profile-email">archaeopteryx1500@gmail.com</div>
+                <div class="profile-stats">
+                    <div class="stat">
+                        <div class="stat-number" id="savedCount">0</div>
+                        <div class="stat-label">Saved</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">1.2K</div>
+                        <div class="stat-label">Followers</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">856</div>
+                        <div class="stat-label">Following</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="createdGamesCount">5</div>
+                        <div class="stat-label">Created</div>
+                    </div>
+                </div>
+            </div>
 
-            // Swipe up (like scrolling down)
-            if (deltaY > sensitivity) {
-                scrollToSection(currentIndex + 1);
-            }
-            // Swipe down (like scrolling up)
-            else if (deltaY < -sensitivity) {
-                scrollToSection(currentIndex - 1);
-            }
-        };
+            <div class="menu-options">
+                <button class="menu-option" id="uploadGameBtn">📱 Upload Game</button>
+                <button class="menu-option" id="viewCreatedGames">🎮 My Games</button>
+                <button class="menu-option">⚙️ Settings</button>
+                <button class="menu-option" style="color: #ff4444;">🚪 Sign Out</button>
+            </div>
+        </div>
 
-        // --- Attach Event Listeners ---
-        window.addEventListener('wheel', handleWheel);
-        window.addEventListener('touchstart', handleTouchStart);
-        window.addEventListener('touchmove', handleTouchMove);
+        <div class="page" id="creatorProfilePage">
+            <div class="page-header">
+                <button class="back-button" id="creatorBackButton">←</button>
+                <div class="page-title" id="creatorPageTitle">Creator</div>
+            </div>
+            
+            <div class="profile-info">
+                <div class="profile-avatar-large" id="creatorAvatar">J</div>
+                <div class="profile-name" id="creatorName">jafar</div>
+                <div class="profile-email" id="creatorEmail">Game Creator</div>
+                <button class="follow-btn" id="followCreatorBtn">Follow</button>
+                <div class="profile-stats">
+                    <div class="stat">
+                        <div class="stat-number" id="creatorFollowers">856</div>
+                        <div class="stat-label">Followers</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="creatorFollowing">234</div>
+                        <div class="stat-label">Following</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="creatorGamesCount">10</div>
+                        <div class="stat-label">Games</div>
+                    </div>
+                </div>
+            </div>
 
-    </script>
+            <div class="games-grid" id="creatorGamesGrid">
+            </div>
+        </div>
+
+        <div class="page" id="savedGamesPage">
+            <div class="page-header">
+                <button class="back-button" id="savedBackButton">←</button>
+                <div class="page-title">Saved Games</div>
+            </div>
+            
+            <div class="games-grid" id="savedGamesGrid">
+            </div>
+            
+            <div class="no-results" id="noSavedGames" style="display: none;">
+                No saved games yet. Save some games to see them here!
+            </div>
+        </div>
+
+        <div class="upload-modal" id="uploadModal">
+            <div class="upload-form">
+                <div class="page-header">
+                    <button class="back-button" id="uploadBackButton">←</button>
+                    <div class="page-title">Upload Game</div>
+                </div>
+                
+                <form id="gameUploadForm">
+                    <div class="form-group">
+                        <label class="form-label">Game Title</label>
+                        <input type="text" class="form-input" id="gameTitle" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <input type="text" class="form-input" id="gameDescription">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Categories (select multiple)</label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;">
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" name="categories" value="arcade"> Arcade
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" name="categories" value="puzzle"> Puzzle
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" name="categories" value="action"> Action
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" name="categories" value="strategy"> Strategy
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" name="categories" value="casual"> Casual
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Game Files (ZIP)</label>
+                        <input type="file" class="form-input" id="gameFiles" accept=".zip" required>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Upload Game</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="swipe-indicator swipe-left" id="swipeLeftIndicator">← Focus Mode</div>
+        <div class="swipe-indicator swipe-right" id="swipeRightIndicator">Exit Focus →</div>
+
+        <button class="focus-exit-btn" id="focusExitBtn">← Exit Focus</button>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>
